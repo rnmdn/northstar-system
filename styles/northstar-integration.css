@@ -1,0 +1,19 @@
+/* Astra functionality on NorthStar's original blue and white interface. */
+:root{--action:#315ce0;--action-hover:#204abf;--action-text:#fff;--focus:#315ce0;--text:#102747;--text-muted:#47607f;--surface:#f5f9fd;--surface-secondary:#e7f2ff;--surface-raised:#fff;--selection-surface:#e7f2ff;--border:#a5bdd7;--control-border:#7895ba;--placeholder:#47607f;--warning:#75551d;--error-surface:#fff0f0;--progress-surface:#fff;--brand-gold:#dfc18b}
+.brand,.footer-brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.brand .astra-mark img,.footer-brand .astra-mark img{display:block;width:44px;height:44px;object-fit:contain;filter:none}
+.astra-wordmark{font:650 17px/1.2 "Segoe UI",sans-serif;letter-spacing:.18em;color:#edc98d}
+.bank-v3 .v3-panel{max-width:1100px}.bank-v3 .flow-top{background:var(--pale);color:var(--ink)}
+.v3-panel .button{border-radius:999px}.v3-panel .button-primary{background:var(--action);color:#fff}.v3-panel .button-outline{background:transparent;color:var(--action);border-color:var(--action)}
+.v3-panel .button-primary:hover{background:var(--action-hover)}
+.storage-panel{color:var(--ink);background:var(--pale)}
+.site-header .nav-links a{color:#ddf2ff}
+.v3-panel #v3-status{color:#204abf}
+.bank-v3 .flow-top h1,.bank-v3 .v3-panel h2{font-family:Georgia,"Times New Roman",serif}
+@media(max-width:650px){.astra-wordmark{font-size:15px}.brand .astra-mark img,.footer-brand .astra-mark img{width:36px;height:36px}}
+
+.bank-v3 .flow-nav a,.bank-v3 .flow-nav span{color:#47607f;opacity:1}
+.bank-v3 .flow-nav a::before,.bank-v3 .flow-nav span::before{background:#fff;border:1px solid #7895ba;color:#47607f;box-shadow:none}
+.bank-v3 .flow-nav .active{color:#102747;font-weight:700}
+.bank-v3 .flow-nav .active::before{background:#315ce0;border-color:#315ce0;color:#fff}
+.bank-v3 .flow-nav a::after,.bank-v3 .flow-nav span::after{background:#7895ba}

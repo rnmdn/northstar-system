@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#06152d">
+  <title>Skills assessment — NorthStar</title><meta name="description" content="Answer IT knowledge questions and practical tasks as part of your Astra assessment.">
+  <link rel="stylesheet" href="styles/student.css?v=2">
+  <link rel="stylesheet" href="styles/skills-assessment.css?v=3">
+  <link rel="stylesheet" href="styles/journey-header.css">
+<link rel="stylesheet" href="styles/assessment-evidence.css?v=1"><link rel="stylesheet" href="styles/storage.css?v=2"><link rel="stylesheet" href="styles/assessment-v3.css?v=4"><link rel="stylesheet" href="styles/northstar-integration.css?v=1"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;display=swap"><link rel="stylesheet" href="styles/assessment-flow.css?v=11"></head>
+<body>
+  <a href="#main" class="skip">Skip to content</a>
+  <header class="site-header"><nav class="nav container" aria-label="Main navigation"><a class="brand" href="index.html"><span class="astra-mark" aria-hidden="true"><img src="assets/astra-orbit-logo.png" alt="" width="60" height="52"></span><span class="astra-wordmark">NORTHSTAR</span></a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button><div class="nav-links" id="nav-links"><a href="review.html">Review profile</a><a class="button button-primary journey-action" href="#stage-label">Current question <span class="arrow" aria-hidden="true">→</span></a></div></nav></header>
+  <main id="main">
+    <section class="flow-top"><div class="container"><h1>Skills assessment</h1><div class="flow-nav" aria-label="Progress"><a href="assessment.html" data-step="assessment.html">Profile</a><a href="review.html" data-step="review.html">Review</a><span class="active" aria-current="step" data-step="skills-assessment.html">Skills assessment</span><span data-step="results.html">Results</span><span data-step="next-steps.html">Next steps</span></div></div></section>
+    <div class="container layout"><section class="main-panel" aria-labelledby="page-heading"><h2 class="page-title" id="page-heading">Your skills assessment</h2><div class="notice"><p>50 knowledge questions, 6 written scenarios, and 1 coding task. Complete each step to continue. Work is saved on this server. Use the recovery page to return from another browser. Avoid personal details in written responses.</p></div>
+    <div class="assessment-stage" aria-live="polite"><div class="assessment-stage-heading"><p id="stage-label">Loading assessment…</p><span id="stage-count"></span></div><div class="assessment-track" role="progressbar" aria-label="Skills assessment progress" aria-valuemin="0" aria-valuemax="58" aria-valuenow="0"><div id="stage-fill"></div></div></div>
+    <div class="stage-shortcuts" id="stage-shortcuts" hidden><details id="stage-review-menu"><summary>Review earlier answers</summary><div class="stage-shortcuts-picker"><label for="stage-jump">Completed step</label><select id="stage-jump"></select><button type="button" id="stage-jump-go">Go to answer</button></div></details><button type="button" id="stage-return" hidden></button><p id="stage-return-hint" role="status" hidden>Finish this answer before returning.</p></div>
+    <form id="pilot-form">
+      <section aria-labelledby="quiz-heading">
+        <h2 id="quiz-heading">Knowledge questions</h2>
+        <p>Choose the best answer to continue. Each correct answer earns 1 point: 50 points overall and 5 per skill area. Incorrect answers earn 0 points.</p>
+        <p id="quiz-progress" role="status">Loading questions…</p>
+        <div id="quiz"></div>
+      </section>
+      <section aria-labelledby="tasks-heading">
+        <h2 id="tasks-heading">Practical scenarios</h2>
+        <p>Explain your reasoning in your own words. You do not need to write code or use external tools. Each scenario has three criteria worth 1 point each (0–3 points; 18 overall). Open its scoring guide for details. AI feedback can make mistakes.</p>
+        <div id="tasks"></div>
+      </section>
+      <section aria-labelledby="coding-heading">
+        <h2 id="coding-heading">JavaScript coding task</h2>
+        <p>Write a function named <code>larger(a, b)</code> that returns the larger number. If the numbers are equal, return that number. Edit the starter code, then run the sample checks. You can retry as often as you like. Use comparisons, if/else, ternaries, local variables, or Math.max/Math.min; loops and other calls are not supported for this task. Each passing server check earns 1 point across 8 checks covering either input being larger, equal values, zero and negative numbers. The latest run is shown; passing these checks does not establish overall programming proficiency.</p>
+        <label for="code-editor">Your JavaScript code</label>
+        <textarea class="code" id="code-editor" maxlength="20000" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
+        <div class="actions">
+          <button type="button" id="run-code">Run sample checks</button>
+          <button type="button" class="secondary" id="reset-code">Reset starter code</button>
+        </div>
+        <p id="code-status" role="status" aria-live="polite"></p>
+        <pre id="code-output" aria-label="Sample check results">Run your code to see sample results.</pre>
+        <p class="muted">The sample checks show whether your code produced the expected outputs. Your code is saved with your assessment.</p>
+      </section>
+      <section aria-labelledby="evidence-heading">
+        <h2 id="evidence-heading">Review your saved work</h2>
+        <p>Your answers are saved on this server. Review an earlier answer above, or continue to your skills results.</p>
+        <ul id="evidence-summary"></ul>
+        <div class="actions"><a class="button-link" href="skills-results.html" id="view-feedback">View my skill results →</a></div>
+      </section>
+      <div class="assessment-pager" id="assessment-pager"><button type="button" class="secondary" id="stage-back">← Back</button><button type="button" id="stage-next">Continue →</button></div>
+    </form>
+    </section><aside class="sidebar"><h2>Your answers, your pace</h2><p>Your answers are saved in this browser tab as you go. Written scenarios receive automatic AI feedback on the results page.</p></aside></div>
+  </main>
+  <footer class="footer"><div class="container footer-bottom"><a class="footer-brand" href="index.html"><span class="astra-mark" aria-hidden="true"><img src="assets/astra-orbit-logo.png" alt="" width="60" height="52"></span><span class="astra-wordmark">NORTHSTAR</span></a><span>Explore with curiosity. Choose with care.</span><div class="footer-links"><a href="index.html">Home</a><a href="assessment.html">Assessment</a><a href="resume.html">Recovery options</a></div></div></footer>
+  <script src="scripts/storage.js?v=4" data-modules="scripts/bank-v3.js?v=1,scripts/bank-v4.js?v=1,scripts/learning-plan.js?v=1,scripts/assessment-v3.js?v=21,scripts/skills-assessment.js?v=storage1,scripts/skills-navigation.js?v=storage1,scripts/journey.js?v=storage1" defer></script>
+  <script defer src="scripts/assessment-evidence.js?v=1"></script>
+</body>
+</html>

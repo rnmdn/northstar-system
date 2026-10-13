@@ -1,0 +1,187 @@
+/* Shared presentation for the current five-step assessment journey. */
+.bank-v3{display:flex;flex-direction:column;min-height:100vh;background:#f7f9fc;color:#102747;font-family:Outfit,"Segoe UI",sans-serif;scrollbar-color:#a5bdd7 #f7f9fc}
+.bank-v3 main{flex:1}
+.bank-v3 ::selection{background:#cde1ff;color:#06152d}
+.bank-v3 :is(a,button,input,select,textarea,summary):focus-visible{outline:3px solid #315ce0;outline-offset:3px}
+.bank-v3 .site-header{background:#06152d}
+.bank-v3 .site-header .nav{min-height:80px;gap:24px;flex-wrap:wrap}
+.bank-v3 .site-header .nav-links:empty,.bank-v3 .site-header .nav-toggle{display:none}
+.bank-v3 .site-header .storage-panel{order:1;max-width:none;margin:0 0 0 auto;padding:0;border:0;background:none;color:#c5d7e9;font:14px/1.5 Outfit,"Segoe UI",sans-serif}
+.bank-v3 .site-header .storage-summary{gap:8px}
+.bank-v3 .site-header #storage-status::before{content:"";display:inline-block;width:6px;height:6px;margin:0 9px 2px 0;border-radius:50%;background:#9bb7d3}
+.bank-v3 .site-header .storage-panel button{background:#12315b;border-color:#7895ba;color:#fff}
+.bank-v3 .site-header #storage-message{max-width:50ch;color:#fff}
+.bank-v3 .flow-top{background:#06152d;color:#ddf2ff;border-bottom:1px solid #a98552;padding:20px 0}
+.bank-v3 .flow-top .container{gap:36px}
+.bank-v3 .flow-top h1{color:#fff;font:400 32px/1.2 Georgia,serif;letter-spacing:0;margin:0}
+.bank-v3 .flow-nav{margin-top:0}
+.bank-v3 .flow-nav a,.bank-v3 .flow-nav span{color:#b6cce2;opacity:1}
+.bank-v3 .flow-nav .active{color:#ddf2ff;background:transparent}
+.bank-v3 .flow-nav a::before,.bank-v3 .flow-nav span::before{background:#06152d;border-color:#7895ba;color:#b6cce2;box-shadow:none}
+.bank-v3 .flow-nav .active::before{background:#ddf2ff;border-color:#ddf2ff;color:#06152d}
+.bank-v3 .flow-nav a::after,.bank-v3 .flow-nav span::after{background:#7895ba}
+.bank-v3 .layout{max-width:960px;padding-top:56px;padding-bottom:64px}
+.bank-v3 .v3-panel{width:100%;max-width:880px;margin:0 auto;padding-bottom:0}
+.bank-v3 .v3-panel>h2:first-of-type{font:400 clamp(32px,4vw,44px)/1.15 Georgia,serif;letter-spacing:-.035em;margin:0 0 24px;text-wrap:balance}
+.bank-v3 .v3-panel>p{max-width:65ch;line-height:1.65}
+.bank-v3 .v3-prompt{max-width:70ch;line-height:1.7}
+.bank-v3 .v3-card{padding:22px 24px;margin:14px 0;border:1px solid #d4dfea;border-radius:12px}
+.bank-v3 .v3-card h3{margin:0 0 12px;font:600 20px/1.3 Outfit,"Segoe UI",sans-serif}
+.bank-v3 .v3-card p{margin:8px 0;line-height:1.55}
+.bank-v3 .v3-actions{border-color:#dce5ef}
+.bank-v3 .v3-panel .button{min-height:50px;padding:13px 23px;border-radius:8px;font:600 16px/1.2 Outfit,"Segoe UI",sans-serif}
+.bank-v3 .v3-note{font-size:13px;line-height:1.6;color:#52677d}
+.bank-v3 .footer{margin-top:auto}
+.bank-v3 .footer-links a{text-underline-offset:4px}
+.bank-v3 .v3-panel :is(input,select,textarea){caret-color:#315ce0}
+@media(max-width:700px){
+  .bank-v3 .site-header .nav{gap:12px;padding-block:14px}
+  .bank-v3 .site-header .storage-panel{font-size:12px}
+  .bank-v3 .layout{width:calc(100% - 40px);padding-top:36px}
+  .bank-v3 .v3-card{padding:18px}
+  .bank-v3 .flow-top h1{font-size:26px}
+  .bank-v3 .flow-nav a,.bank-v3 .flow-nav span{font-size:11px;line-height:1.2}
+}
+@media(prefers-reduced-motion:reduce){.bank-v3 *{transition:none!important}}
+
+/* Recovery keeps the same type, color, and control language. */
+body[data-page="resume"]{background:#f7f9fc;color:#102747;font-family:Outfit,"Segoe UI",sans-serif}
+body[data-page="resume"] .site-header{background:#06152d}
+body[data-page="resume"] .site-header .nav{min-height:80px}
+body[data-page="resume"] .site-header a:last-child{color:#ddf2ff}
+body[data-page="resume"] main{display:flex;flex-direction:column;width:min(100% - 40px,880px);margin:0 auto;padding:56px 0 80px}
+body[data-page="resume"] main>h1{order:-1;width:100%;margin:0 0 24px;font:400 clamp(32px,4vw,44px)/1.15 Georgia,serif;letter-spacing:-.035em}
+body[data-page="resume"] .storage-panel{width:100%;max-width:none;margin:0;padding:22px 24px;border:1px solid #d4dfea;border-radius:9px;background:#fff;color:#102747;font:16px/1.55 Outfit,"Segoe UI",sans-serif}
+body[data-page="resume"] .storage-panel button{border-color:#315ce0;background:#315ce0;color:#fff;border-radius:8px}
+body[data-page="resume"] .storage-panel input{border-color:#a5bdd7;color:#102747}
+body[data-page="resume"] .storage-panel h2{font:600 20px/1.3 Outfit,"Segoe UI",sans-serif}
+body[data-page="resume"] .storage-panel p{max-width:68ch;color:#47607f;line-height:1.6}
+body[data-page="resume"] .storage-panel input{min-height:48px}
+body[data-page="resume"] .storage-panel :is(#storage-code,#copy-recovery,.storage-actions button){background:#fff;border-color:#a5bdd7;color:#204abf}
+body[data-page="resume"] .storage-panel :is(#storage-code,#copy-recovery,.storage-actions button):hover{background:#e7f2ff;border-color:#315ce0}
+body[data-page="resume"] .storage-actions{gap:8px;padding-top:20px;border-top:1px solid #d4dfea}
+body[data-page="resume"] .storage-actions button{font-size:14px}
+body[data-page="resume"] .storage-actions #storage-signout{margin-left:auto;background:transparent;border-color:transparent;color:#9b3944;text-decoration:underline;text-underline-offset:3px}
+body[data-page="resume"] .storage-actions #storage-signout:hover{background:#fff0f0;border-color:#e4b7bd}
+@media(max-width:700px){body[data-page="resume"] main{padding-top:36px}body[data-page="resume"] .storage-panel{padding:18px}}
+@media(max-width:700px){body[data-page="resume"] .storage-actions #storage-signout{margin-left:0}}
+
+/* The certificate stays a printable document with the site's blue and gold palette. */
+.certificate-page{background:#f7f9fc;color:#102747}
+.certificate-page .certificate-toolbar{max-width:none;background:#06152d;color:#fff}
+.certificate-page .certificate-toolbar a{color:#ddf2ff}
+.certificate-page .certificate-toolbar button{background:#315ce0}
+.certificate-page .certificate-toolbar button:hover{background:#204abf}
+.certificate-page .certificate,.certificate-page .certificate-empty{background:#f8fbff;color:#102747}
+.certificate-page .certificate-subtitle,.certificate-page .certificate-recipient>p,.certificate-page .completion-statement,.certificate-page .certificate-meta p,.certificate-page .certificate-note,.certificate-page .print-tip{color:#47607f}
+.certificate-page .certificate h2,.certificate-page .certificate-empty a{color:#204abf}
+@media print{.certificate-page{background:#fff}.certificate-page .certificate{background:#f8fbff}}
+
+/* Wide coding workspace overrides the shared narrow assessment container. */
+body.bank-v3.coding-question .layout{width:calc(100% - 80px);max-width:1440px}
+body.bank-v3.coding-question .v3-panel{max-width:none}
+body.bank-v3.coding-question .coding-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:48px}
+body.bank-v3.coding-question .code-source-form textarea{min-height:480px}
+@media(max-width:960px){body.bank-v3.coding-question .layout{width:calc(100% - 40px);max-width:720px}body.bank-v3.coding-question .coding-layout{grid-template-columns:1fr;gap:24px}body.bank-v3.coding-question .code-source-form textarea{min-height:320px}}
+
+/* Keep answer controls aligned and separated from their labels. */
+body.bank-v3 .question-form .v3-option{display:flex;align-items:center;gap:18px}
+body.bank-v3 .question-form .v3-option input[type="radio"]{position:static;width:20px;height:20px;min-width:20px;min-height:20px;margin:0 2px 0 0;padding:0;flex:0 0 20px;align-self:center}
+body.bank-v3 .question-form .v3-option>span{min-width:0;line-height:1.5}
+
+/* Task-specific widths retain one shared assessment shell. */
+body.bank-v3.written-question .layout{max-width:800px}
+body.bank-v3.written-question .v3-panel{max-width:800px}
+body.bank-v3.coding-question .question-code{white-space:pre-wrap;overflow-wrap:anywhere}
+body.bank-v3.coding-question .coding-solution .question-form{margin-top:0}
+body.bank-v3.coding-question .code-source-form label{margin-top:0;line-height:1.7}
+
+/* Keep the existing navy journey header; pin only the question actions. */
+body.bank-v3[data-page="skills-assessment"] .layout{padding-bottom:150px}
+body.bank-v3[data-page="skills-assessment"] .exam-navigation{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#f6f9fd;border-top:1px solid #cad8e8;margin:0;padding:16px max(24px,calc((100vw - 1200px)/2));padding-bottom:calc(16px + env(safe-area-inset-bottom));flex-wrap:nowrap}
+.exam-save-status{font-size:14px;color:#435775;text-align:center;flex:1}
+body.bank-v3.written-question .layout{width:calc(100% - 80px);max-width:1200px}
+body.bank-v3.written-question .v3-panel{max-width:none}
+body.bank-v3.written-question .coding-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:40px}
+body.bank-v3.written-question textarea{min-height:160px;line-height:1.6;padding:18px;box-sizing:border-box}
+body.bank-v3.written-question .coding-solution>form>label{display:block;font-size:18px;font-weight:600;margin-bottom:12px}
+body.bank-v3[data-page="skills-assessment"] .v3-panel{scroll-padding-bottom:120px}
+body.bank-v3[data-page="skills-assessment"] #v3-status:not(:empty){background:#edf2f8;padding:12px;border-radius:8px}
+@media(max-width:1023px){body.bank-v3.written-question .layout{width:calc(100% - 40px);max-width:800px}body.bank-v3.written-question .coding-layout{grid-template-columns:1fr;gap:24px}body.bank-v3.coding-question .coding-layout{grid-template-columns:1fr}}
+@media(max-width:600px){body.bank-v3[data-page="skills-assessment"] .exam-navigation{padding-left:20px;padding-right:20px;gap:12px}.exam-save-status{font-size:12px}}
+
+/* Score explanations are attached to the score students are reviewing. */
+.bank-v3 .score-help{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;text-align:left;border:0;background:transparent;color:inherit;padding:0;font:inherit;cursor:pointer}
+.score-help .v3-score,.score-help .v3-pending{flex:1;min-width:0}
+.score-help-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid #6481a6;border-radius:50%;font-size:14px;font-weight:700;color:#315ce0;flex:none}
+.score-help:hover .score-help-icon{background:#e7efff;border-color:#315ce0}
+.score-dialog{width:min(680px,calc(100vw - 40px));max-height:85dvh;box-sizing:border-box;padding:28px;border:1px solid #c9d7e7;border-radius:14px;background:#f8fbff;color:#102747;overflow:auto}
+.score-dialog::backdrop{background:rgba(6,21,45,.55)}
+.score-dialog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.bank-v3 .score-dialog-heading h3{margin:0;font-size:21px}
+.score-dialog-close{border:1px solid #7895ba;background:#fff;color:#102747;border-radius:6px;padding:10px 14px;font:inherit;cursor:pointer}
+.score-explanation-item{padding:22px 0;border-bottom:1px solid #d4dfea}.score-explanation-item:last-child{border-bottom:0}
+.bank-v3 .score-explanation-item h4{margin:0 0 10px;font-size:18px}.score-explanation-total{font-weight:600}
+.score-criteria{padding-left:22px;line-height:1.65}.score-criteria li{margin:12px 0}.score-criteria blockquote{margin:8px 0;color:#435775;font-size:14px}
+.score-submitted{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf2f8;padding:16px;border-radius:8px;font:14px/1.6 Consolas,'Courier New',monospace}
+@media(max-width:600px){.score-dialog{padding:20px}.score-dialog-heading{gap:12px}.bank-v3 .score-dialog-heading h3{font-size:18px}}
+
+body.bank-v3[data-page="results"] .layout{max-width:1200px}
+body.bank-v3[data-page="results"] .v3-panel{max-width:none}
+.career-summary{max-width:75ch;font-size:18px;line-height:1.7}.career-summary-label{font-size:14px;color:#435775;margin-bottom:36px}
+.bank-v3 .career-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:end;border:0;margin:36px 0 24px}
+.bank-v3 .career-podium .rf-result{display:flex;flex-direction:column;min-width:0;box-sizing:border-box;background:#edf3fa;border:1px solid #cbd9eb;border-radius:14px;padding:26px;min-height:330px}
+.career-podium .podium-place-1{grid-column:2;grid-row:1;min-height:380px!important;background:#e3edfc!important;border-color:#8fa9dc!important}
+.career-podium .podium-place-2{grid-column:1;grid-row:1;min-height:350px!important}
+.career-podium .podium-place-3{grid-column:3;grid-row:1}
+.bank-v3 .career-podium h3{font-size:24px;line-height:1.3;margin:8px 0 18px}
+.podium-rank{font-size:14px;font-weight:600;color:#435775;margin:0!important}
+.podium-match{display:flex;align-items:center;gap:10px;font-size:15px;color:#435775}
+.podium-match details{position:relative;padding:0}.podium-match summary{font-size:19px;list-style:none;cursor:pointer}
+.podium-match details p{position:absolute;z-index:3;top:24px;right:0;width:240px;box-sizing:border-box;padding:16px;background:#fff;border:1px solid #cbd9eb;border-radius:8px;font-size:14px;line-height:1.6}
+.podium-description{font-size:16px;line-height:1.6;margin:22px 0!important}
+.podium-breakdown{margin-top:auto;min-height:44px;background:none;border:0;padding:8px 0;color:#204abf;font:600 15px/1.5 Outfit,'Segoe UI',sans-serif;text-align:left;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.podium-plan{text-align:center;margin:28px 0 40px}
+@media(max-width:800px){.bank-v3 .career-podium{grid-template-columns:1fr;gap:16px}.career-podium .rf-result{grid-column:1!important;grid-row:auto!important;min-height:0!important}.podium-match details p{left:-180px;right:auto}.podium-plan .button{width:100%;box-sizing:border-box}}
+
+.bank-v3 .podium-match .model-match-help{font-size:13px;font-weight:400;color:#204abf;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.podium-match{flex-wrap:wrap}
+
+/* Completed journey steps use checks; the active step keeps its number. */
+.bank-v3 .flow-nav .completed::before{content:'';background:#ddf2ff;border-color:#ddf2ff;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m6 12 4 4 8-8' fill='none' stroke='%2306152d' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-size:20px;background-position:center;background-repeat:no-repeat}
+.bank-v3 .flow-nav .completed{color:#ddf2ff}.bank-v3 .flow-nav .completed::after{background:#ddf2ff}
+
+/* Equal ranked cards present evidence without a winners' podium. */
+.bank-v3 .career-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:stretch;border:0;margin:28px 0 0}
+.bank-v3 .career-cards .career-card{display:flex;flex-direction:column;min-width:0;padding:26px;box-sizing:border-box;background:#fff;border:1px solid #cad8e8;border-radius:12px}
+.career-card-rank{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px;font-size:13px;color:#435775}
+.top-model-match{background:#e6eeff;color:#204abf;font-weight:600;border-radius:5px;padding:5px 8px}
+.bank-v3 .career-card h3{font-size:24px;line-height:1.3;min-height:94px;margin:16px 0 18px}
+.career-match{display:flex;align-items:baseline;gap:9px}.career-match strong{font-size:27px;font-variant-numeric:tabular-nums;color:#102747}.career-match>span{font-size:14px;color:#435775}
+.career-match-track{height:5px;background:#e3ecf7;border-radius:3px;margin:12px 0 18px;overflow:hidden}.career-match-track>span{display:block;height:100%;background:#315ce0;border-radius:3px}
+.bank-v3 .career-card .career-description{font-size:16px;line-height:1.6;color:#435775;margin:0 0 20px;min-height:78px}
+.bank-v3 .career-card .career-input-evidence{font-size:14px;color:#435775;line-height:1.7;margin:0 0 18px}.career-input-evidence strong{color:#102747;font-weight:500}
+.career-first-step{border-top:1px solid #dce5ef;padding:18px 0 14px;margin-top:auto;min-height:105px}
+.bank-v3 .career-first-step h4{font-size:14px;font-weight:600;margin:0 0 8px}.bank-v3 .career-first-step p{margin:0;font-size:15px;line-height:1.6}
+.bank-v3 .career-card .podium-breakdown{margin:0;min-height:48px;font-size:15px}
+.career-plan-choice{display:flex;align-items:center;gap:12px;padding-top:14px;border-top:1px solid #dce5ef;min-height:44px;cursor:pointer;font-weight:500;font-size:15px}
+.career-plan-choice input{width:20px;height:20px;margin:0;accent-color:#315ce0;flex:none}
+.career-preliminary{display:flex;align-items:flex-start;gap:18px;background:#eaf1fb;border:1px solid #cad8e8;border-radius:10px;padding:18px 22px;margin:26px 0 18px}
+.career-preliminary>strong{font-size:14px;background:#d9e6fa;padding:5px 9px;border-radius:5px;color:#193c76;flex:none}.career-preliminary p{margin:0;font-size:15px;line-height:1.65;color:#304968}
+.career-match-note{font-size:14px;color:#435775;line-height:1.6;max-width:95ch}
+.career-plan-action{display:flex;justify-content:space-between;align-items:center;gap:28px;margin:40px 0 44px;padding-top:24px;border-top:1px solid #dce5ef}.career-plan-action p{font-size:15px;line-height:1.6;max-width:65ch;margin:0}.career-plan-action .button{flex-shrink:0}
+@media(max-width:950px){.bank-v3 .career-cards{grid-template-columns:1fr}.bank-v3 .career-card h3,.bank-v3 .career-card .career-description,.career-first-step{min-height:0}.career-card-rank{justify-content:flex-start;gap:16px}.career-plan-action{flex-direction:column;align-items:stretch;gap:20px}.career-plan-action .button{text-align:center}.career-preliminary{flex-direction:column;gap:12px}}
+
+/* Score-based learning starts with a resource and a concrete practice step. */
+.learning-rules{font-size:14px;color:#435775;max-width:85ch}
+.learning-path{background:#fff;border:1px solid #cad8e8;border-radius:12px;padding:28px;margin:24px 0}
+.learning-path-heading{display:flex;align-items:baseline;justify-content:space-between;gap:20px}.bank-v3 .learning-path-heading h3{margin:0;font-size:24px}
+.learning-start{font-size:14px;font-weight:600;background:#e6eeff;color:#204abf;padding:7px 11px;border-radius:6px;flex-shrink:0}
+.learning-score{font-size:14px;line-height:1.6;color:#435775;margin:12px 0}
+.learning-focus{font-size:16px;line-height:1.6;margin:18px 0 24px}
+.learning-steps{display:grid;grid-template-columns:1fr 1fr;gap:32px;border-top:1px solid #dce5ef;padding-top:22px}
+.bank-v3 .learning-steps h4{font-size:18px;margin:0 0 14px}.learning-steps h5{font-size:17px;margin:0 0 10px}.learning-steps p{font-size:16px;line-height:1.65;margin:12px 0}
+.learning-steps .learning-resource-meta,.learning-steps .learning-prerequisite{font-size:14px;color:#435775}
+.learning-steps small{display:block;font-size:12px;color:#435775;margin-top:8px}
+.learning-reflection{border-top:1px solid #dce5ef;margin-top:26px}.learning-reflection label{display:block;font-size:15px;margin:16px 0 8px}
+@media(max-width:700px){.learning-path{padding:20px}.learning-path-heading{align-items:flex-start;flex-direction:column;gap:12px}.learning-steps{grid-template-columns:1fr;gap:26px}.bank-v3 .learning-path-heading h3{font-size:21px}}

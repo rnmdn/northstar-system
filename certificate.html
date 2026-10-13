@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#06152d"><title>Completion certificate — NorthStar</title><link rel="stylesheet" href="styles/certificate.css?v=1"><script src="scripts/storage.js?v=4" data-modules="scripts/bank-v3.js?v=1,scripts/bank-v4.js?v=1,scripts/learning-plan.js?v=1,scripts/assessment-v3.js?v=21,scripts/certificate.js?v=storage1" defer></script><link rel="stylesheet" href="styles/storage.css?v=2"><link rel="stylesheet" href="styles/assessment-v3.css?v=1"><link rel="stylesheet" href="styles/northstar-integration.css?v=1"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;display=swap"><link rel="stylesheet" href="styles/assessment-flow.css?v=11"></head>
+<body class="certificate-page">
+<nav class="certificate-toolbar" aria-label="Certificate actions"><a href="skills-results.html">← Back to my results</a><button id="print-certificate" type="button" hidden>Print / save PDF</button></nav>
+<main>
+<section class="certificate-empty" id="certificate-empty"><h1>Your certificate is not ready yet</h1><p>Complete the skills assessment and enter your name on the results page to create your completion certificate.</p><a href="skills-results.html">Go to skills results →</a></section>
+<article class="certificate" id="certificate" aria-labelledby="certificate-title" hidden>
+  <div class="certificate-brand"><img src="assets/astra-orbit-logo.png" width="40" height="35" alt=""><span>NORTHSTAR</span></div>
+  <h1 id="certificate-title">Certificate of Completion</h1>
+  <p class="certificate-subtitle">NorthStar Skills Assessment</p>
+  <div class="certificate-recipient"><p>This certifies that</p><h2 id="participant-name"></h2></div>
+  <p class="completion-statement">completed the NorthStar skills assessment.</p>
+  <div class="certificate-meta"><div><p>Completion date</p><strong id="completion-date"></strong></div><img class="certificate-seal" src="assets/astra-compass-star.svg" width="52" height="52" alt=""><div><p>Assessment record ID</p><strong id="record-id"></strong></div></div>
+  <p class="certificate-note">A record of assessment completion. This certificate does not certify professional proficiency.</p>
+</article>
+<p class="print-tip" id="print-tip" hidden>Select “Save as PDF” in the print window to download your certificate.</p>
+</main>
+</body></html>

@@ -1,0 +1,18 @@
+/* One compact journey header across all five student-facing steps. */
+.flow-top{padding:18px 0 16px}
+.flow-top .container{display:grid;grid-template-columns:minmax(0,1fr) minmax(520px,640px);align-items:center;gap:24px}
+.flow-top h1{margin:0;font-size:clamp(1.5rem,2.3vw,2rem);line-height:1.15}
+.flow-top .container>p{display:none}
+.flow-nav{width:100%;max-width:640px;margin-top:0}
+.flow-nav span,.flow-nav a{min-height:58px;gap:5px;font-size:.72rem}
+.flow-nav span::before,.flow-nav a::before{width:30px;height:30px;font-size:.78rem}
+.flow-nav span::after,.flow-nav a::after{top:14px}
+@media(max-width:900px){.flow-top .container{grid-template-columns:minmax(0,1fr);gap:10px}}
+@media(max-width:650px){
+  .flow-top{padding:14px 0}
+  .flow-top h1{font-size:1.55rem}
+  .flow-nav{margin-top:10px}
+  .flow-nav span,.flow-nav a{min-height:60px;font-size:.7rem}
+  .flow-nav span::before,.flow-nav a::before{width:28px;height:28px}
+  .flow-nav span::after,.flow-nav a::after{top:13px}
+}

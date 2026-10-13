@@ -1,0 +1,688 @@
+{
+  "items": [
+    {
+      "id": "Q01",
+      "skill": "programming",
+      "level": "F",
+      "stem": "What does a variable store in a program?",
+      "options": [
+        "A value that can be used later",
+        "A network address",
+        "A database table",
+        "A screen layout"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q02",
+      "skill": "programming",
+      "level": "F",
+      "stem": "Which structure repeats an action while a condition remains true?",
+      "options": [
+        "A comment",
+        "A constant",
+        "A file",
+        "A loop"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q03",
+      "skill": "programming",
+      "level": "A",
+      "stem": "A function returns x + 2. What does it return when x is 3?",
+      "options": [
+        "6",
+        "32",
+        "3",
+        "5"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q04",
+      "skill": "programming",
+      "level": "A",
+      "stem": "A test expects 4 but receives 5. What does this result establish?",
+      "options": [
+        "The program has a security flaw",
+        "The tested behavior differs from the expectation",
+        "All code is incorrect",
+        "The test cannot be rerun"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q05",
+      "skill": "programming",
+      "level": "D",
+      "stem": "A list has three entries at indexes 0, 1, and 2. Code tries to read index 3. What is the most direct fix?",
+      "options": [
+        "Read index 2 when the last entry is needed",
+        "Add a comment",
+        "Rename the list",
+        "Repeat the same read"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q06",
+      "skill": "networks",
+      "level": "F",
+      "stem": "What identifies a device interface on an IP network?",
+      "options": [
+        "A file extension",
+        "A table name",
+        "A browser tab",
+        "An IP address"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q07",
+      "skill": "networks",
+      "level": "F",
+      "stem": "What is DNS mainly used for?",
+      "options": [
+        "Joining database tables",
+        "Compiling code",
+        "Resolving names to network addresses",
+        "Encrypting a disk"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q08",
+      "skill": "networks",
+      "level": "A",
+      "stem": "Two devices use 192.168.1.10/24 and 192.168.1.20/24 on the same LAN. What can they normally do without a router?",
+      "options": [
+        "Ignore link connectivity",
+        "Communicate on that LAN",
+        "Reach every internet site",
+        "Use different subnet masks automatically"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q09",
+      "skill": "networks",
+      "level": "A",
+      "stem": "A device can ping its router but cannot resolve example.com. Which service should be checked first?",
+      "options": [
+        "DNS",
+        "Printer spooler",
+        "Database backup",
+        "Source control"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q10",
+      "skill": "networks",
+      "level": "D",
+      "stem": "One laptop loses Wi-Fi while nearby laptops remain connected. What is the best first check?",
+      "options": [
+        "Replace the building router immediately",
+        "Reconfigure every switch",
+        "Disable the firewall for all users",
+        "Check that laptop’s Wi-Fi state and local connection"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q11",
+      "skill": "security",
+      "level": "F",
+      "stem": "Authentication answers which question?",
+      "options": [
+        "How fast is the network?",
+        "Which chart is best?",
+        "Who is requesting access?",
+        "What files are backed up?"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q12",
+      "skill": "security",
+      "level": "F",
+      "stem": "What does least privilege mean?",
+      "options": [
+        "Remove all logs",
+        "Give only access needed for a task",
+        "Give all users administrator access",
+        "Share one account across a team"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q13",
+      "skill": "security",
+      "level": "A",
+      "stem": "An account has many failed logins followed by one successful login from a new location. What is a reasonable first interpretation?",
+      "options": [
+        "The event needs investigation",
+        "The account is certainly compromised",
+        "The event is certainly harmless",
+        "Logs should be deleted"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q14",
+      "skill": "security",
+      "level": "A",
+      "stem": "A colleague asks for your password to complete their task. What should you do?",
+      "options": [
+        "Send the password privately",
+        "Post it in the team chat",
+        "Disable account monitoring",
+        "Decline and use an approved access request"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q15",
+      "skill": "security",
+      "level": "D",
+      "stem": "A suspicious endpoint alert appears. Which response best preserves evidence while following procedure?",
+      "options": [
+        "Publicly post the logs",
+        "Immediately wipe the device without authorization",
+        "Record details and escalate under the incident playbook",
+        "Delete the alert and wait"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q16",
+      "skill": "data_analysis",
+      "level": "F",
+      "stem": "What is a missing value in a dataset?",
+      "options": [
+        "A chart title",
+        "A field without an observed value",
+        "A guaranteed zero",
+        "A duplicate column"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q17",
+      "skill": "data_analysis",
+      "level": "F",
+      "stem": "For values 2, 4, and 6, what is the mean?",
+      "options": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q18",
+      "skill": "data_analysis",
+      "level": "A",
+      "stem": "Monthly users rise from 100 to 120. What is the percentage increase relative to 100?",
+      "options": [
+        "20%",
+        "25%",
+        "120%",
+        "10%"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q19",
+      "skill": "data_analysis",
+      "level": "A",
+      "stem": "A chart shows sales rose in June. Can it alone prove a new website caused the rise?",
+      "options": [
+        "Yes, all charts prove cause",
+        "No, charts cannot show change",
+        "No, other factors could explain it",
+        "Yes, timing proves cause"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q20",
+      "skill": "data_analysis",
+      "level": "D",
+      "stem": "A dataset contains duplicate orders. What should happen before counting unique orders?",
+      "options": [
+        "Use only the first ten rows",
+        "Identify duplicates using a reliable order ID",
+        "Add all rows without checking",
+        "Delete every repeated customer"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q21",
+      "skill": "databases",
+      "level": "F",
+      "stem": "What is a primary key used for?",
+      "options": [
+        "Uniquely identifying a table row",
+        "Encrypting every column",
+        "Drawing a chart",
+        "Starting a server"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q22",
+      "skill": "databases",
+      "level": "F",
+      "stem": "What does a foreign key usually represent?",
+      "options": [
+        "A network gateway",
+        "A backup file",
+        "A user password",
+        "A reference to a row in another table"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q23",
+      "skill": "databases",
+      "level": "A",
+      "stem": "A query uses WHERE status = 'active'. Which rows should it return?",
+      "options": [
+        "Only rows with missing status",
+        "Only duplicate rows",
+        "Only rows whose status is active",
+        "Every row in the table"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q24",
+      "skill": "databases",
+      "level": "A",
+      "stem": "Each student can enroll in many courses, and each course has many students. What table is usually needed?",
+      "options": [
+        "No relationship table",
+        "An enrollment table linking student and course IDs",
+        "A single course-name field in student",
+        "A password table"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q25",
+      "skill": "databases",
+      "level": "D",
+      "stem": "A report counts the same order twice after joining orders to order_items. What is the likely reason?",
+      "options": [
+        "One order has multiple matching item rows",
+        "The database has no tables",
+        "The query ran too slowly",
+        "The order ID is encrypted"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q26",
+      "skill": "interface_design",
+      "level": "F",
+      "stem": "Why should a form field have a visible label?",
+      "options": [
+        "It automatically stores answers",
+        "It makes the database faster",
+        "It replaces error messages",
+        "People can understand what to enter"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q27",
+      "skill": "interface_design",
+      "level": "F",
+      "stem": "What is a usability test mainly used to observe?",
+      "options": [
+        "Network packet loss",
+        "Code compilation speed",
+        "How people complete tasks with an interface",
+        "Server CPU temperature"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q28",
+      "skill": "interface_design",
+      "level": "A",
+      "stem": "Two users cannot find the Submit button because it appears only after horizontal scrolling. Which change directly addresses the evidence?",
+      "options": [
+        "Add more decorative images",
+        "Keep the action visible within the layout",
+        "Increase database storage",
+        "Rename the API endpoint"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q29",
+      "skill": "interface_design",
+      "level": "A",
+      "stem": "A form shows “Error” after submission. Which message is more useful?",
+      "options": [
+        "“Enter a valid email address in Email.”",
+        "“Error.”",
+        "“Something happened.”",
+        "No message"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q30",
+      "skill": "interface_design",
+      "level": "D",
+      "stem": "A redesign looks cleaner, but users now take longer to finish a task. What should the team do next?",
+      "options": [
+        "Keep it because it looks cleaner",
+        "Hide completion time",
+        "Remove all labels",
+        "Observe where users slow down and test a revision"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q31",
+      "skill": "problem_solving",
+      "level": "F",
+      "stem": "What is a hypothesis in troubleshooting?",
+      "options": [
+        "A final report",
+        "A random change",
+        "A testable possible explanation",
+        "A guaranteed answer"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q32",
+      "skill": "problem_solving",
+      "level": "F",
+      "stem": "Why reproduce a reported problem?",
+      "options": [
+        "To replace all system parts",
+        "To observe conditions and check a proposed cause",
+        "To prove the user is wrong",
+        "To avoid recording evidence"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q33",
+      "skill": "problem_solving",
+      "level": "A",
+      "stem": "An app fails only after a new configuration is enabled. Which clue is most relevant?",
+      "options": [
+        "The configuration change and failure timing",
+        "The app logo color",
+        "The developer’s favorite tool",
+        "A different app’s version"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q34",
+      "skill": "problem_solving",
+      "level": "A",
+      "stem": "Two possible causes are a bad network route and a stopped app service. Which check best separates them?",
+      "options": [
+        "Restart everything at once",
+        "Change both settings together",
+        "Ask another user to guess",
+        "Test route reachability and service status separately"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q35",
+      "skill": "problem_solving",
+      "level": "D",
+      "stem": "A proposed fix does not change the symptom. What is the best next step?",
+      "options": [
+        "Apply the same fix repeatedly",
+        "Delete the incident notes",
+        "Revisit the hypothesis and collect new evidence",
+        "Declare success"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q36",
+      "skill": "systems",
+      "level": "F",
+      "stem": "What is an operating system service?",
+      "options": [
+        "A spreadsheet cell",
+        "A background process that provides a function",
+        "A printed report",
+        "A network cable"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q37",
+      "skill": "systems",
+      "level": "F",
+      "stem": "What do file permissions control?",
+      "options": [
+        "Who may read, change, or execute a file",
+        "How many files exist",
+        "The screen resolution",
+        "The network provider"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q38",
+      "skill": "systems",
+      "level": "A",
+      "stem": "A server shows disk use at 99%. Which symptom is plausible?",
+      "options": [
+        "All network routes change",
+        "Every password expires",
+        "The CPU becomes a database",
+        "New writes may fail"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q39",
+      "skill": "systems",
+      "level": "A",
+      "stem": "Before changing a production service setting, what is a safe preparation step?",
+      "options": [
+        "Share administrator credentials",
+        "Disable backups",
+        "Record the current setting and rollback plan",
+        "Delete the logs"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q40",
+      "skill": "systems",
+      "level": "D",
+      "stem": "A web service stops after a restart; the host responds to ping. What should be checked next?",
+      "options": [
+        "Printer paper",
+        "Service status and logs",
+        "Monitor brightness",
+        "Database table colors"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q41",
+      "skill": "software_design",
+      "level": "F",
+      "stem": "What does separation of concerns aim to do?",
+      "options": [
+        "Keep different responsibilities in appropriate components",
+        "Put all logic in one function",
+        "Avoid tests",
+        "Make every file identical"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q42",
+      "skill": "software_design",
+      "level": "F",
+      "stem": "What is an interface between components?",
+      "options": [
+        "Only a visual screen",
+        "A backup schedule",
+        "A network address",
+        "An agreed way they exchange data or behavior"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q43",
+      "skill": "software_design",
+      "level": "A",
+      "stem": "A checkout page formats prices and also calculates tax rules. Where should reusable tax calculation usually live?",
+      "options": [
+        "In every page as copied code",
+        "In an image asset",
+        "In a separate business-logic component",
+        "Only in the button color rule"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q44",
+      "skill": "software_design",
+      "level": "A",
+      "stem": "A form sends data to an API, which stores it in a database. Which sequence matches the data flow?",
+      "options": [
+        "Form, database, no API",
+        "Form, API, database",
+        "Database, form, API",
+        "API, database, form before input"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q45",
+      "skill": "software_design",
+      "level": "D",
+      "stem": "The same validation rule is copied across three pages and changes often. What is the most maintainable small change?",
+      "options": [
+        "Move the shared rule into one reusable function",
+        "Copy it to more pages",
+        "Delete validation",
+        "Change only one copy"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q46",
+      "skill": "troubleshooting",
+      "level": "F",
+      "stem": "Why record the exact error message?",
+      "options": [
+        "It guarantees the cause",
+        "It replaces a test",
+        "It increases bandwidth",
+        "It provides a clue that can be checked"
+      ],
+      "key": 3
+    },
+    {
+      "id": "Q47",
+      "skill": "troubleshooting",
+      "level": "F",
+      "stem": "What does a reproducible failure mean?",
+      "options": [
+        "Only one user can report it",
+        "Logs are unnecessary",
+        "The same steps can trigger it again",
+        "The problem is solved"
+      ],
+      "key": 2
+    },
+    {
+      "id": "Q48",
+      "skill": "troubleshooting",
+      "level": "A",
+      "stem": "A service error starts at 10:02, two minutes after a deployment. What should the investigator inspect first?",
+      "options": [
+        "Unrelated printer settings",
+        "Deployment changes and related logs",
+        "Yesterday’s weather",
+        "User profile photos"
+      ],
+      "key": 1
+    },
+    {
+      "id": "Q49",
+      "skill": "troubleshooting",
+      "level": "A",
+      "stem": "A site fails for one user but works for others. Which first test helps narrow scope?",
+      "options": [
+        "Try another browser or device for that user",
+        "Replace the database server",
+        "Delete every user account",
+        "Assume the site works for everyone"
+      ],
+      "key": 0
+    },
+    {
+      "id": "Q50",
+      "skill": "troubleshooting",
+      "level": "D",
+      "stem": "A fix appears to restore service. What best verifies resolution?",
+      "options": [
+        "Close the incident without checking",
+        "Delete the original report",
+        "Change another setting",
+        "Repeat the failing steps and monitor for recurrence"
+      ],
+      "key": 3
+    }
+  ],
+  "tasks": [
+    {
+      "id": "P1",
+      "title": "Software development",
+      "prompt": "A function meant to return the larger of two numbers returns the smaller one when a = 8 and b = 3. Its logic is: if (a > b) return b; otherwise return a. Describe the defect, a correction, and one test you would run."
+    },
+    {
+      "id": "P2",
+      "title": "Networking",
+      "prompt": "A laptop has IP 192.168.10.25/24 and gateway 192.168.10.1. It can ping 192.168.10.1 but cannot open example.com. A second laptop on the same Wi-Fi can open it. Give one likely cause, a check that could confirm it, and a correction if confirmed."
+    },
+    {
+      "id": "P3",
+      "title": "Cybersecurity",
+      "prompt": "A sample alert shows ten failed sign-ins for one account, then a successful sign-in from a new location. You do not know whether the user is traveling. Explain what you would check, what evidence you would preserve, and when you would escalate. Do not assume compromise is certain."
+    },
+    {
+      "id": "P4",
+      "title": "Data analytics",
+      "prompt": "A club reports 80 sign-ups in June and 100 in July, then says its new poster caused a 25% increase. Calculate the percentage change and explain one reason the cause claim needs more evidence."
+    },
+    {
+      "id": "P5",
+      "title": "Database administration",
+      "prompt": "A report joins Orders(order_id, customer_id) with OrderItems(item_id, order_id). Order 42 has three items and appears three times. Explain why, describe a safe way to count orders, and name one check before changing a production query."
+    },
+    {
+      "id": "P6",
+      "title": "UI/UX and web development",
+      "prompt": "Two students using a mobile application form missed the Submit button because it was off-screen to the right. Describe a layout change, one accessibility check, and a quick test with users to see whether the change helps."
+    }
+  ],
+  "quizVersion": "skill_quiz_pilot_v0_1",
+  "practicalVersion": "practical_pilot_v0_1"
+}

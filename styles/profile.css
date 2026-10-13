@@ -1,0 +1,26 @@
+/* Profile flow: one forward action and clearly differentiated answers. */
+body[data-page="assessment"]{--text-muted:#584966}
+.profile-sections{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;list-style:none;margin:0 0 32px;padding:0}
+.profile-sections li{border-top:5px solid #cbbdd8;padding-top:10px;color:#584966;font-size:15px;line-height:1.4}
+.profile-sections li.current{border-color:#6c4695;color:#2b2038;font-weight:700}
+.profile-sections li.past{border-color:#9676b5}
+.exposure-fieldset{border:0;min-width:0;margin:22px 0 0;padding:0}
+.exposure-fieldset legend{padding:0;color:#2b2038;font-size:17px;font-weight:700}
+html[data-theme="dusty-lavender"] body[data-page="assessment"] .exposure-option{border:1px solid #b7adbf;background:#f6f2fa;align-items:flex-start;font-size:17px;font-weight:400;min-height:112px;padding:20px}
+.exposure-option input{margin-top:3px}
+.exposure-option span{min-width:0}
+.exposure-option strong{display:block;font-weight:500;line-height:1.4}
+.exposure-option small{display:block;margin-top:5px;color:#584966;font-size:15px;font-weight:400;line-height:1.45}
+html[data-theme="dusty-lavender"] body[data-page="assessment"] .exposure-option:has(input:checked){border:2px solid #6c4695;padding:19px;background:#e0cfee}
+.exposure-option:has(input:checked) strong{font-weight:700}
+html[data-theme="dusty-lavender"] body[data-page="assessment"] .exposure-option:hover{border-color:#6c4695}
+.exposure-none{grid-column:1/-1}
+body[data-page="assessment"] .answer-status{justify-content:flex-start;align-items:center;gap:12px;color:#584966;font-size:16px}
+.optional-chip{padding:3px 9px;border:1px solid #b7adbf;border-radius:5px;color:#584966;font-size:13px;font-weight:700}
+body[data-page="assessment"] form .actions .back-link,body[data-page="assessment"] form .actions .back-link:hover{border:0;border-radius:0;background:transparent;color:#6c4695;padding:10px 0;font:700 16px/1.5 "Cabinet Grotesk",sans-serif;text-decoration:underline;text-underline-offset:4px;cursor:pointer;min-height:44px}
+.back-link:focus-visible{outline:3px solid #6c4695;outline-offset:4px}
+body[data-page="assessment"] .actions{justify-content:space-between}
+body[data-page="assessment"] .actions .button-dark{margin-left:auto}
+.tab-storage-note{margin:32px 0 0;color:#584966;font-size:15px;line-height:1.5}
+body[data-page="assessment"] .sidebar p{color:#584966;font-size:16px}
+@media(max-width:650px){.profile-sections{gap:8px;margin-bottom:26px}.profile-sections li{font-size:12px;padding-top:8px}.profile-sections li span{display:block}html[data-theme="dusty-lavender"] body[data-page="assessment"] .exposure-option{min-height:96px;padding:16px;font-size:17px}html[data-theme="dusty-lavender"] body[data-page="assessment"] .exposure-option:has(input:checked){padding:15px}.exposure-option small{font-size:15px}.exposure-fieldset legend{font-size:16px}.back-link{flex:none;width:auto!important}}

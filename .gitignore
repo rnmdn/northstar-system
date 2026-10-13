@@ -1,0 +1,18 @@
+# Keep downloaded job postings and generated audit output out of the public site.
+data/raw/
+data/processed/
+data/kaggle-audit.json
+outputs/
+
+node_modules/
+.npm-cache/
+.astra-data/
+.astra-backups/
+.astra-restored/
+.env
+.env.*
+__pycache__/
+*.pyc
+tools/tmp*/
+.rf-venv/
+models/team-rf/*.joblib

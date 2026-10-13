@@ -1,0 +1,54 @@
+Rows used: 504 | features: domain (6) | companies: 156
+Networking                  102
+Software development         90
+Cybersecurity                84
+Data science & analytics     83
+Database administration      77
+UI/UX & web development      68
+
+Holdout split: train 404 / test 100 (grouped by company)
+Best RF params: {'n_estimators': 300, 'min_samples_leaf': 4, 'max_features': 0.3, 'max_depth': 12}
+
+Holdout test results
+                          accuracy  macro_f1  top3_accuracy
+Decision Tree (baseline)      0.87     0.870           0.97
+Random Forest                 0.89     0.891           0.99
+
+Random Forest per-class report
+                          precision    recall  f1-score   support
+
+           Cybersecurity      0.938     0.882     0.909        17
+Data science & analytics      0.938     0.938     0.938        16
+ Database administration      1.000     0.867     0.929        15
+              Networking      0.870     1.000     0.930        20
+    Software development      0.765     0.722     0.743        18
+ UI/UX & web development      0.867     0.929     0.897        14
+
+                accuracy                          0.890       100
+               macro avg      0.896     0.890     0.891       100
+            weighted avg      0.892     0.890     0.889       100
+
+Confusion matrix (rows = true, columns = predicted)
+                          Cybersecurity  Data science & analytics  Database administration  Networking  Software development  UI/UX & web development
+Cybersecurity                        15                         0                        0           2                     0                        0
+Data science & analytics              0                        15                        0           0                     1                        0
+Database administration               0                         0                       13           0                     2                        0
+Networking                            0                         0                        0          20                     0                        0
+Software development                  1                         1                        0           1                    13                        2
+UI/UX & web development               0                         0                        0           0                     1                       13
+
+Grouped 5-fold CV: accuracy 0.893 | macro-F1 0.897 +/- 0.028 | top-3 0.974
+
+Source check: trained on Greenhouse/Lever (415 rows), tested on Himalayas (89 rows): accuracy 0.921
+If this is much lower than the holdout accuracy, the model may be learning posting style, not job content.
+
+Top 15 features by importance
+Database administration     0.1848
+Data science & analytics    0.1758
+UI/UX & web development     0.1736
+Networking                  0.1715
+Cybersecurity               0.1645
+Software development        0.1298
+
+FINAL model: best grouped-CV macro-F1 0.899 with {'n_estimators': 200, 'min_samples_leaf': 4, 'max_features': 0.3, 'max_depth': 20}
+Saved model_outputs/final_model.joblib (trained on all 504 rows)

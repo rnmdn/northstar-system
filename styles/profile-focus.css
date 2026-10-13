@@ -1,0 +1,51 @@
+
+.profile-focused .layout{max-width:880px;padding-top:56px;padding-bottom:48px}
+.profile-focused .v3-panel{width:100%;max-width:760px;padding-bottom:0}
+.profile-focused #v3-heading{font:400 clamp(32px,4vw,44px)/1.15 Georgia,serif;letter-spacing:-.035em;max-width:760px;margin:0 0 28px;text-wrap:balance}
+.profile-stepper{margin:0 0 28px}.profile-stepper ol{display:flex;list-style:none;padding:0;margin:0;gap:24px;border-bottom:1px solid #dce5ef}
+.profile-stepper li{flex:1;position:relative;padding-bottom:16px}.profile-stepper li.is-current::after{content:"";position:absolute;inset:auto 0 -1px;height:2px;background:#315ce0}
+.profile-stepper button{border:0;padding:0;display:flex;align-items:center;gap:10px;font:500 15px/1.4 Outfit,sans-serif;color:#52677d;background:none;min-height:32px;white-space:nowrap}
+.profile-stepper button:disabled{opacity:1;cursor:default;color:#66798c}.profile-stepper .is-current button{color:#204abf;font-weight:600}.profile-step-dot{width:26px;height:26px;display:grid;place-items:center;border:1px solid #c5d7e9;border-radius:50%;font-size:12px;background:#fff}
+.is-current .profile-step-dot{background:#315ce0;border-color:#315ce0;color:#fff}.is-complete .profile-step-dot{background:#e7f2ff;color:#204abf}
+.profile-intro{max-width:65ch;font-size:17px;line-height:1.65;color:#47607f;margin:0 0 30px}
+.profile-choice-meta{display:flex;justify-content:space-between;gap:16px;font-size:14px;color:#52677d;margin-bottom:12px}
+.profile-focused .experience-options{margin:0}.profile-focused .experience-option{padding:16px 18px;margin:0 0 8px;gap:16px;align-items:center;background:#fff;border:1px solid #d4dfea;border-radius:9px;transition:background .18s,border-color .18s,box-shadow .18s}
+.profile-focused .experience-option:hover{border-color:#91abd1;background:#fbfdff}.profile-focused .experience-option:has(input:checked){padding:15px 17px;border:2px solid #315ce0;background:#edf3ff}
+.experience-option input{width:19px;height:19px;margin:0!important;accent-color:#315ce0}.experience-option>span{min-width:0}
+.experience-option strong{display:block;font-size:17px;line-height:1.4;font-weight:500;color:#102747}.experience-option:has(input:checked) strong{font-weight:600;color:#173e9b}
+.experience-hint{display:block;font-size:15px;line-height:1.5;color:#52677d;margin-top:3px}
+.profile-focused .experience-none{margin-top:24px;border-style:dashed;background:transparent}.profile-focused .experience-none:has(input:checked){border-style:solid}
+.profile-focused .profile-why{padding:12px 0 0}.profile-why summary{font-weight:500;color:#52677d;font-size:14px}.profile-why p{font-size:15px;line-height:1.6;color:#52677d;max-width:65ch}
+.profile-focused .v3-actions{padding:24px 0 0;margin:28px 0 0;border-color:#dce5ef}.profile-focused .v3-actions .button{font:600 16px/1.2 Outfit,sans-serif;min-height:50px;padding:14px 24px;border-radius:8px}
+.profile-back{border:0;background:transparent;color:#47607f;padding:12px 0;font:500 16px Outfit,sans-serif;cursor:pointer}
+.profile-focused .v3-panel fieldset:not(.experience-options){margin:30px 0 40px}.profile-focused .v3-panel legend{font-weight:500;font-size:20px}
+@media(max-width:700px){.profile-focused .layout{width:calc(100% - 40px);padding-top:36px}.profile-stepper ol{gap:12px}.profile-stepper button{gap:6px;font-size:13px}.profile-step-dot{width:23px;height:23px}.profile-focused .experience-option{padding:14px;gap:12px}.profile-focused .experience-option:has(input:checked){padding:13px}.experience-hint{font-size:14px}.profile-focused .v3-actions .button{padding-inline:18px;font-size:15px}}
+
+.interest-group{margin:32px 0 44px}.interest-group h3{font-size:20px;font-weight:600}
+.interest-table{width:100%;border-collapse:collapse;table-layout:fixed}.interest-table th:first-child{width:45%}
+.interest-table thead th{font-size:14px;color:#47607f;font-weight:500;padding:10px 4px;text-align:center}.interest-table thead th:first-child{text-align:left}
+.interest-table thead span{display:block;font-size:11px;line-height:1.4;margin-top:4px}
+.interest-table tbody th{text-align:left;font-size:16px;line-height:1.5;font-weight:400;padding:18px 16px 18px 0}
+.interest-table td{padding:8px 3px;text-align:center}.interest-table tbody tr{border-top:1px solid #dce5ef}
+.interest-cell{display:flex;justify-content:center;align-items:center;min-height:46px;border-radius:6px;cursor:pointer}.interest-cell:hover{background:#edf3ff}.interest-cell:has(input:checked){background:#e1ebff;outline:1px solid #315ce0}
+.interest-cell input{width:20px;height:20px;accent-color:#315ce0;margin:0}.interest-cell span{display:none}
+@media(max-width:650px){.interest-table thead{display:none}.interest-table,.interest-table tbody{display:block}.interest-table tr{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:16px 0}.interest-table tbody th:first-child{grid-column:1/-1;width:auto;padding:0 0 14px}.interest-table td{padding:3px}.interest-cell{position:relative;min-height:64px;background:#fff;border:1px solid #d4dfea}.interest-cell input{position:absolute;opacity:0}.interest-cell span{display:block;font-size:16px}.interest-cell small{display:block;font-size:10px}.interest-cell:has(input:focus-visible){outline:3px solid #315ce0;outline-offset:2px}}
+
+.profile-tab-count{font-size:12px;font-weight:600;color:#47607f;margin-left:2px}
+.profile-assurance{max-width:68ch;margin:0 0 20px;padding:16px 20px;border:1px solid #b8cdee;border-radius:10px;background:#e7f2ff;color:#17365e;font-size:16px;line-height:1.55}
+.profile-assurance strong{font-weight:700}
+.work-style-progress{margin:0 0 18px;color:#47607f;font-size:14px;font-weight:600}
+.profile-focused .v3-panel fieldset.work-style-question{margin:0 0 16px;padding:20px;border:1px solid #d4dfea;border-radius:10px;background:#fff;scroll-margin-block:100px}
+.profile-focused .v3-panel fieldset.work-style-question.is-missing{border-color:#ba4652;box-shadow:0 0 0 2px #f3d6d9}
+.profile-focused .v3-panel .work-style-question legend{float:left;width:100%;padding:0;margin:0 0 14px;font:600 17px/1.45 Outfit,"Segoe UI",sans-serif;color:#102747}
+.question-index{display:block;margin-bottom:5px;color:#52677d;font-size:12px;font-weight:600;letter-spacing:.04em}
+.question-prompt{display:block}
+.work-style-choices{clear:both;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.work-style-option{position:relative;display:flex;align-items:center;min-height:96px;padding:18px 44px 18px 18px;border:1px solid #c8d5e3;border-radius:8px;background:#f8fbff;color:#102747;font-size:15px;line-height:1.45;cursor:pointer}
+.work-style-option:hover{border-color:#7895ba;background:#f1f6ff}
+.work-style-option input{position:absolute;width:1px;height:1px;opacity:0}
+.work-style-option:has(input:checked){border:2px solid #315ce0;padding:17px 43px 17px 17px;background:#e7f2ff;font-weight:600}
+.work-style-option:has(input:checked)::after{content:"✓";position:absolute;right:14px;top:14px;display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:#315ce0;color:#fff;font:700 15px/1 Outfit,"Segoe UI",sans-serif}
+.work-style-option:has(input:focus-visible){outline:3px solid #315ce0;outline-offset:3px}
+.profile-focused .v3-actions.work-style-actions{position:sticky;z-index:2;bottom:0;margin:22px 0 0;padding:16px 0 max(16px,env(safe-area-inset-bottom));background:#f7f9fc;box-shadow:0 -10px 20px #f7f9fc}
+@media(max-width:650px){.work-style-choices{grid-template-columns:1fr;gap:8px}.work-style-option{min-height:68px}.profile-tab-count{display:none}.profile-focused .v3-panel fieldset.work-style-question{padding:16px}.profile-focused .v3-actions.work-style-actions{gap:8px}}

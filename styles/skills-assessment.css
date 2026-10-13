@@ -1,0 +1,114 @@
+.main-panel form > section { margin: 38px 0; }
+.main-panel form > section:first-child { margin-top: 30px; }
+.main-panel form > section > h2 { font-size: 1.55rem; line-height: 1.2; margin: 0 0 8px; }
+.main-panel form > section > p { margin: 0 0 20px; color: var(--muted); }
+.main-panel form > section > p[role=status] { color: var(--teal-dark); font-weight: 750; }
+.assessment-stage { margin: 28px 0 0; }
+.assessment-stage-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 12px; }
+.assessment-stage p { margin: 0; color: var(--teal-dark); font-weight: 800; }
+.assessment-stage-heading span { color: var(--muted); font-size: .86rem; font-weight: 750; white-space: nowrap; }
+.assessment-track { height: 8px; overflow: hidden; border-radius: 99px; background: var(--line); }
+.assessment-track div { height: 100%; background: var(--cobalt); transform: scaleX(0); transform-origin: left; transition: transform .3s ease-out; }
+.stage-shortcuts { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 14px 0 0; }
+.stage-shortcuts details { flex: 1 1 280px; }
+.stage-shortcuts summary { width: fit-content; min-height: 44px; display: flex; align-items: center; color: var(--teal-dark); font-weight: 750; cursor: pointer; }
+.stage-shortcuts summary:focus-visible,.stage-shortcuts select:focus-visible,.stage-shortcuts button:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.stage-shortcuts-picker { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px 12px; align-items: end; margin: 6px 0 12px; }
+.stage-shortcuts-picker label { grid-column: 1/-1; font-size: .85rem; font-weight: 700; }
+.stage-shortcuts select { width: 100%; min-width: 0; min-height: 48px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; background:var(--white); color: var(--ink); font: inherit; }
+.stage-shortcuts button { min-height: 48px; padding: 9px 18px; border: 1px solid var(--cobalt); border-radius: 100px; background: var(--cobalt); color: white; font: inherit; font-weight: 800; cursor: pointer; }
+.stage-shortcuts button:disabled { opacity: .5; cursor: not-allowed; }
+.stage-shortcuts #stage-return { background:var(--white); color: var(--teal-dark); }
+.stage-shortcuts #stage-return-hint { flex-basis: 100%; color: var(--muted); font-size: .85rem; }
+.skill-group-heading { margin: 28px 0 4px; padding-bottom: 10px; border-bottom: 1px solid var(--line); color: var(--teal-dark); font-size: 1.22rem; }
+#quiz fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+#quiz legend { font-size: clamp(1.25rem,2vw,1.65rem); font-weight: 750; line-height: 1.4; padding: 0 0 24px; max-width: 100%; }
+#quiz .quiz-options { display: grid; grid-template-columns: 1fr; gap: 12px; }
+#quiz .option { position: relative; display: flex; align-items: center; gap: 16px; min-height: 62px; margin: 0; padding: 15px 20px; background:var(--white); border: 1px solid var(--line); border-radius: 4px; font-weight: 650; line-height: 1.4; cursor: pointer; transition: border-color .18s ease,background-color .18s ease; }
+#quiz .option:hover { border-color: #B9A0FF; background: var(--paper); }
+#quiz .option:has(input:checked) { border-color: var(--cobalt); background: var(--paper); }
+#quiz .option:has(input:focus-visible) { outline: 3px solid var(--teal); outline-offset: 2px; }
+#quiz input[type=radio] { flex: 0 0 auto; accent-color: var(--teal-dark); margin: 0; }
+#tasks section { padding: 26px; border: 1px solid var(--line); background:var(--white); box-shadow: 0 8px 30px #1027470b; }
+#tasks h3 { font-size: 1.12rem; line-height: 1.3; margin: 0 0 8px; }
+#tasks p { margin: 0 0 16px; max-width: 75ch; }
+form label:not(.option) { display: block; font-weight: 700; margin: 16px 0 7px; }
+textarea { display: block; width: 100%; min-height: 120px; padding: 13px 15px; color: var(--ink); caret-color: var(--teal-dark); background:var(--white); border: 1px solid var(--line); border-radius: 8px; font: inherit; resize: vertical; }
+textarea.short { min-height: 82px; }
+textarea.code { min-height: 250px; font: 14px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 2; }
+textarea:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+form .actions { justify-content: flex-start; margin: 20px 0 28px; }
+form .actions button,form .button-link { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 12px 23px; border: 1px solid var(--cobalt); border-radius: 100px; background: var(--cobalt); color: white; font: inherit; font-weight: 800; line-height: 1.2; text-align: center; text-decoration: none; cursor: pointer; }
+form .actions button:hover,form .button-link:hover { background: var(--teal-dark); }
+form .actions button.secondary { background: transparent; color: var(--dark); }
+form .actions button.secondary:hover { background: var(--pale); }
+form .actions button:disabled { opacity: .45; cursor: not-allowed; }
+.assessment-pager { display: flex; justify-content: space-between; gap: 12px; margin: 30px 0 16px; }
+.assessment-pager #stage-next { margin-left: auto; }
+.assessment-pager button { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 12px 23px; border: 1px solid var(--cobalt); border-radius: 100px; background: var(--cobalt); color: white; font: inherit; font-weight: 800; cursor: pointer; }
+.assessment-pager button:hover { background: var(--teal-dark); }
+.assessment-pager button.secondary { background: transparent; color: var(--dark); }
+.assessment-pager button.secondary:hover { background: var(--pale); }
+form pre { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--pale); padding: 20px; }
+form .muted { color: var(--muted); }
+#evidence-summary { padding-left: 20px; }
+#evidence-summary li { margin: 7px 0; }
+#practice-feedback { padding: 26px; background: var(--pale); }
+#practice-feedback > h2 { margin-top: 0; }
+#domain-feedback { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1px 20px; list-style: none; margin: 20px 0; padding: 0; }
+#domain-feedback li { border-bottom: 1px solid var(--line); padding: 10px 0; }
+#domain-feedback strong { display: block; }
+#domain-feedback span { color: var(--muted); font-size: .9rem; }
+@media(max-width:650px){
+  .main-panel form > section { margin: 30px 0; }
+  #domain-feedback { grid-template-columns: 1fr; }
+  form .actions button,form .button-link { width: 100%; }
+  .assessment-pager button { flex: 1; }
+  .assessment-pager button:only-child { flex: 0 1 auto; }
+  #quiz fieldset { padding: 15px 0; }
+  #quiz .quiz-options { grid-template-columns: 1fr; }
+}
+@media(prefers-reduced-motion:reduce){.assessment-track div{transition:none}}
+
+/* Focused assessment layout: one question and its choices at a time. */
+.flow-top { padding: 18px 0 16px; }
+.flow-top .container { display: grid; grid-template-columns: minmax(0,1fr) minmax(520px,640px); align-items: center; gap: 24px; }
+.flow-top h1 { font-size: clamp(1.5rem,2.3vw,2rem); margin: 0; }
+.flow-top p { display: none; }
+.flow-nav { width: 100%; max-width: 640px; margin-top: 0; }
+.flow-nav span,.flow-nav a { min-height: 58px; gap: 5px; font-size: .72rem; }
+.flow-nav span::before,.flow-nav a::before { width: 30px; height: 30px; font-size: .78rem; }
+.flow-nav span::after,.flow-nav a::after { top: 14px; }
+.layout { display: block; max-width: 1040px; padding-top: 28px; }
+.main-panel { width: 100%; }
+.layout > .sidebar { display: none; }
+.main-panel > .page-title,#quiz-heading,#quiz-progress { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.main-panel > .notice { margin: 0; padding: 11px 16px; border-radius: 6px; font-size: .88rem; }
+.main-panel form > section:first-of-type { margin-top: 22px; }
+.main-panel form > section > h2 { font-size: 1.05rem; color: var(--teal-dark); }
+.main-panel form > section > p { font-size: .9rem; }
+#quiz-heading,#quiz-progress { margin: 0; padding: 0; }
+#quiz { padding: clamp(24px,4vw,48px); background: var(--paper); border-radius: 8px; }
+#quiz .skill-group-heading { display: none; }
+.assessment-pager { padding-top: 18px; border-top: 1px solid var(--line); }
+.main-panel form > .error { margin: 16px 0 0; padding: 12px 16px; border-radius: 6px; background: var(--error-surface); }
+@media(max-width:650px){
+  .flow-top { padding: 14px 0; }
+  .flow-top .container { display: block; }
+  .flow-top h1 { font-size: 1.55rem; }
+  .flow-nav { margin-top: 10px; }
+  .flow-nav span,.flow-nav a { min-height: 60px; font-size: .7rem; }
+  .flow-nav span::before,.flow-nav a::before { width: 28px; height: 28px; }
+  .flow-nav span::after,.flow-nav a::after { top: 13px; }
+  .layout { padding-top: 24px; }
+  #quiz { padding: 20px 16px; }
+  #quiz legend { font-size: 1.18rem; }
+  #quiz .option { min-height: 58px; padding: 12px 14px; }
+  .assessment-stage-heading { align-items: flex-start; flex-direction: column; gap: 2px; }
+  .stage-shortcuts { display: block; }
+  .stage-shortcuts-picker { grid-template-columns: 1fr; }
+  .stage-shortcuts #stage-return { width: 100%; margin-top: 8px; }
+}
+@media(min-width:651px) and (max-width:900px){
+  .flow-top .container { grid-template-columns: 1fr; gap: 10px; }
+}

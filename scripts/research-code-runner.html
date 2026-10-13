@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><script>
+window.addEventListener('message', ({ data }) => {
+  if (!data || data.type !== 'run') return;
+  const checks = [[8, 3, 8], [2, 9, 9], [-5, -2, -2], [4, 4, 4], [0, 0, 0], [-8, -3, -3], [0, -1, 0], [100, 100, 100]];
+  try {
+    const larger = new Function(`${data.code}\nreturn larger;`)();
+    if (typeof larger !== 'function') throw new Error('Define a function named larger(a, b).');
+    const results = checks.map(([a, b, expected]) => {
+      try {
+        const actual = larger(a, b);
+        return { input: [a, b], expected, actual: String(actual), passed: actual === expected };
+      } catch (error) {
+        return { input: [a, b], expected, error: String(error), passed: false };
+      }
+    });
+    parent.postMessage({ type: 'result', token: data.token, results }, '*');
+  } catch (error) {
+    parent.postMessage({ type: 'result', token: data.token, error: String(error) }, '*');
+  }
+});
+</script></html>

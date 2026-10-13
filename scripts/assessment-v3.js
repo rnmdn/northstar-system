@@ -1,0 +1,266 @@
+(() => {
+  const store=window.AstraStorage?.cache||sessionStorage;
+  const query=new URLSearchParams(location.search);
+  if(query.get('bank')==='legacy')sessionStorage.setItem('astra-bank-mode','legacy');
+  if(query.get('bank')==='v3')sessionStorage.setItem('astra-bank-mode','v3');
+  if(query.get('bank')==='v4')sessionStorage.setItem('astra-bank-mode','v4');
+  const mode=sessionStorage.getItem('astra-bank-mode')||(store.getItem('astra-item-bank-v3')&&!store.getItem('astra-item-bank-v4')?'v3':'v4');
+  const B=mode==='v3'||!window.AstraBankV4?window.AstraBankV3:window.AstraBankV4,key=B.version==='4.0'?'astra-item-bank-v4':'astra-item-bank-v3';
+  if(mode!=='legacy')sessionStorage.setItem('astra-bank-mode',B.version==='4.0'?'v4':'v3');
+  const page=document.body.dataset.page==='next'?'next-steps':document.body.dataset.page||(location.pathname||'').split('/').pop()?.replace('.html','');
+  if(page&&!document.body.dataset.page)document.body.dataset.page=page;
+  const supported=['assessment','review','skills-assessment','skills-results','results','next-steps','certificate'].includes(page);
+  window.AstraV3={active:supported&&sessionStorage.getItem('astra-bank-mode')!=='legacy'};
+  if(!window.AstraV3.active){if(supported){const n=document.createElement('p');n.className='v3-note';n.innerHTML='<a href="assessment.html?bank=v3">Open Expanded v3 · previous answers are retained</a>';document.querySelector('.main-panel')?.prepend(n);}return;}
+  document.body.classList.add('bank-v3');
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let a;try{a=JSON.parse(store.getItem(key));}catch{}
+  if(!a){a={bankVersion:B.version,profile:{exposure:null,interests:{},styles:{}},responses:{},stage:0,reviewed:false,selected:[],reflections:{}};store.setItem(key,JSON.stringify(a));}
+  const save=()=>store.setItem(key,JSON.stringify(a));
+  const go=url=>window.AstraStorage.navigate(url);
+  const careers=[...new Set(B.items.map(i=>i.career))];
+  const profileDone=()=>a.profile.exposure?.length>0&&B.interests.every(i=>a.profile.interests[i.id])&&B.styles.every(i=>a.profile.styles[i.id]);
+  const fields={ 'OB-NW09':['ipv4_address','subnet_mask','default_gateway','dns_server'], 'OB-CS09':['student_own_draft','student_other_draft','student_own_submitted','researcher_any_submitted'], 'OB-DA09':['cleaned_rows','duplicates_removed','missing_rows_removed','mean_minutes'] };
+  for(const i of B.items)if(i.fields)fields[i.id]=i.fields;
+  if(B.version==='4.0')fields['OB-DA10']=fields['OB-DA09'];
+  const filled=i=>{const v=a.responses[i.id];return i.type==='Knowledge MCQ'?['A','B','C','D'].includes(v):fields[i.id]?v&&fields[i.id].every(k=>Object.hasOwn(v,k)&&v[k]!==''&&v[k]!==null):typeof v==='string'&&!!v.trim();};
+  const skillsDone=()=>B.items.every(filled);
+  const testMode=['practical','written'].includes(query.get('test'))?query.get('test'):null;
+  const testItems=testMode?B.items.filter(i=>testMode==='written'?i.type==='Written scenario':i.maximum===4&&i.type!=='Written scenario'):[];
+  let testReview=false;
+
+  let panel=document.querySelector('.main-panel')||document.querySelector('.skills-results-layout')||document.querySelector('.certificate-empty')||document.querySelector('main .container');
+  if(!panel)return;
+  panel.classList.add('v3-panel');
+  panel.setAttribute('aria-labelledby','v3-heading');
+  document.querySelector('.sidebar')?.remove();
+  const layout=panel.closest('.layout');if(layout)layout.style.gridTemplateColumns='minmax(0,1fr)';
+  const top=document.querySelector('.flow-top p');if(top)top.textContent='A draft assessment of skills, prior exposure, interests, and work preferences. Each construct is reported separately.';
+  const nav=document.querySelector('.flow-nav');
+  const journeyPages=['assessment','review','skills-assessment','results','next-steps'];
+  const currentJourney=journeyPages.indexOf(page==='skills-results'?'results':page);
+  const journeyComplete=[profileDone(),a.reviewed,skillsDone()&&(!!a.submittedAt||B.items.every(i=>a.scores?.grades?.[i.id]?.status==='graded')),!!a.recommendation?.topThree?.length,false];
+  if(nav)nav.innerHTML=[['assessment','Profile','assessment.html',true],['review','Review','review.html',profileDone()],['skills-assessment','Skills assessment','skills-assessment.html',profileDone()&&a.reviewed],['results','Results','skills-results.html',skillsDone()],['next-steps','Next steps','next-steps.html',skillsDone()&&a.selected.length>0]].map(([id,label,url,enabled],index)=>{
+    const active=index===currentJourney,complete=index<currentJourney&&journeyComplete[index],attributes=`class="${active?'active':complete?'completed':''}" ${active?'aria-current="step"':''} aria-label="${label}${complete?', completed':''}"`;
+    return enabled?`<a href="${url}" ${attributes}>${label}</a>`:`<span ${attributes}>${label}</span>`;
+  }).join('');
+  const links=document.querySelector('.nav-links');if(links)links.innerHTML='';
+  const storagePanel=document.querySelector('.storage-panel');
+  const siteNav=document.querySelector('.site-header .nav');
+  if(storagePanel&&siteNav)siteNav.append(storagePanel);
+  const menu=document.querySelector('.nav-toggle');if(menu&&links)menu.onclick=()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));links.classList.toggle('open',open);};
+  const button=(text,id,primary=true)=>`<button type="button" id="${id}" class="button ${primary?'button-primary':'button-outline'}">${text}</button>`;
+  const notice='<p class="v3-note">Your results suggest career paths to explore based on your answers. They do not certify your skills or guarantee career outcomes.</p>';
+  function shell(title,body){panel.innerHTML=`<h2 tabindex="-1" id="v3-heading">${title}</h2>${body}${page==='assessment'?'':notice}`;}
+  function error(message){const n=panel.querySelector('#v3-status');if(n)n.textContent=message;}
+  function invalidate(id){delete a.recommendation;a.selected=[];if(a.scores){delete a.scores.grades[id];a.scores.careers=null;}save();}
+  async function request(route){await window.AstraStorage.flush();const stamp=JSON.stringify(a.responses);const r=await fetch('/api/v3/'+route,{method:'POST',headers:{'Content-Type':'application/json','X-Astra-Assessment':window.AstraStorage.recordId},body:JSON.stringify({bankVersion:B.version,responses:JSON.parse(stamp)}),signal:AbortSignal.timeout(40000)});const result=await r.json();if(!r.ok)throw Error(result.error||'Scoring is unavailable. Your responses are saved.');if(stamp!==JSON.stringify(a.responses))throw Error('Your responses changed during grading. Run the check again.');a.scores=result;if(result.submittedAt)a.submittedAt=result.submittedAt;window.AstraStorage.acceptRevision?.(result.recordRevision);if(result.features)a.features=result.features;save();return result;}
+  const status='<p id="v3-status" role="status" aria-live="polite"></p>';
+  let profileStep=Math.max(0,Math.min(2,Number(query.get('step'))||0));
+  function profile(){
+    if(a.submittedAt)return shell('Your assessment is submitted','<p>Your answers are locked. You can view your scores and explanations.</p><a class="button button-primary" href="skills-results.html">View results →</a>');
+    document.body.classList.add('profile-focused');
+    const p=a.profile;
+    const labels=['Experience','Interests','Work style'];
+    const completed=[!!p.exposure?.length,B.interests.every(i=>p.interests[i.id]),B.styles.every(i=>p.styles[i.id])];
+    const styleCount=()=>B.styles.filter(i=>p.styles[i.id]).length;
+    const stepper='<nav class="profile-stepper" aria-label="Profile sections"><ol>'+labels.map((label,n)=>`<li class="${n===profileStep?'is-current':n<profileStep?'is-complete':''}" ${n===profileStep?'aria-current="step"':''}><button type="button" data-profile-step="${n}" ${n>profileStep&&!completed.slice(0,n).every(Boolean)?'disabled':''}><span class="profile-step-dot" aria-hidden="true">${n<profileStep?'✓':n+1}</span>${label}${n===2&&profileStep===2?` <span class="profile-tab-count" id="work-style-tab-count">${styleCount()}/${B.styles.length}</span>`:''}</button></li>`).join('')+'</ol></nav>';
+    const names={'EX-SD':'Programming project','EX-NW':'Network setup','EX-CS':'Security practice','EX-DA':'Data analysis','EX-DB':'Database work','EX-UX':'Interface or website design','EX-NONE':'None of these yet'};
+    const hints={'EX-SD':'Built or contributed to a working program or application.','EX-NW':'Configured and tested a network with equipment or a simulator.','EX-CS':'Completed an authorized lab involving controls, logs or vulnerabilities.','EX-DA':'Analyzed data and shared findings in a report, chart or notebook.','EX-DB':'Created or maintained a database and used SQL to work with records.','EX-UX':'Designed an interface or built a web page and checked how people use it.','EX-NONE':'I haven’t completed any of these activities yet.'};
+    let content='';
+    if(profileStep===0)content='<p class="profile-intro">Think about class assignments, personal projects, work or authorized labs. Select the activities you have actually completed.</p><div class="profile-choice-meta"><span>Select all that apply</span><span id="profile-selection-count" aria-live="polite"></span></div><fieldset class="experience-options"><legend class="sr-only">Your completed activities</legend>'+B.exposure.map(i=>`<label class="v3-option experience-option ${i.id==='EX-NONE'?'experience-none':''}"><input type="checkbox" value="${i.id}" ${p.exposure?.includes(i.id)?'checked':''}><span><strong>${esc(names[i.id])}</strong><span class="experience-hint">${esc(hints[i.id])}</span></span></label>`).join('')+'</fieldset><details class="profile-why"><summary>Why we ask</summary><p>Completed experiences provide context alongside your skill results. Watching a demonstration alone does not count as completing an activity.</p></details>';
+    if(profileStep===1)content='<p class="profile-intro">Rate your interest in each activity, even if you haven’t tried it yet. There are no correct answers.</p>'+careers.map(c=>`<section class="interest-group"><h3>${esc(c)}</h3><table class="interest-table"><thead><tr><th scope="col">Activity</th>${['Not at all','Slightly','Moderately','Very','Extremely'].map((label,n)=>`<th scope="col">${n+1}<span>${label}</span></th>`).join('')}</tr></thead><tbody>${B.interests.filter(i=>i.career===c).map(i=>`<tr><th scope="row">${esc(i.prompt)}</th>${['Not at all','Slightly','Moderately','Very','Extremely'].map((label,n)=>`<td><label class="interest-cell"><input type="radio" name="${i.id}" data-interest="${i.id}" value="${n+1}" aria-label="${esc(i.prompt)}: ${n+1} — ${label} interested" ${p.interests[i.id]===n+1?'checked':''}><span aria-hidden="true">${n+1}<small>${label}</small></span></label></td>`).join('')}</tr>`).join('')}</tbody></table></section>`).join('');
+    if(profileStep===2)content='<p class="profile-assurance"><strong>No right answers.</strong> Pick what feels most like you. Your preferences do not earn or lose points.</p><p class="work-style-progress" id="work-style-progress" aria-live="polite"></p>'+B.styles.map((i,n)=>`<fieldset class="work-style-question" data-style-question="${i.id}"><legend><span class="question-index">${n+1} of ${B.styles.length}</span><span class="question-prompt">${esc(i.prompt)}</span></legend><div class="work-style-choices">${(n%2?['B','A']:['A','B']).map(v=>`<label class="work-style-option"><input type="radio" name="${i.id}" value="${v}" ${p.styles[i.id]===v?'checked':''}><span>${esc(i[v])}</span></label>`).join('')}</div></fieldset>`).join('');
+    shell(['What have you tried?','What interests you?','How do you like to work?'][profileStep],`${stepper}<form id="v3-form">${content}</form>${status}<div class="v3-actions${profileStep===2?' work-style-actions':''}">${profileStep?'<button type="button" id="v3-back" class="profile-back">← Back</button>':'<span></span>'}${button(['Continue to interests →','Continue to work style →','Review my answers →'][profileStep],'v3-next')}</div>`);
+    const counter=()=>{const el=panel.querySelector('#profile-selection-count');if(el)el.textContent=p.exposure?.includes('EX-NONE')?'No activities yet':`${p.exposure?.length||0} selected`;};counter();
+    const styleProgress=()=>{if(profileStep!==2)return;panel.querySelector('#work-style-progress').textContent=`${styleCount()} of ${B.styles.length} answered`;panel.querySelector('#work-style-tab-count').textContent=`${styleCount()}/${B.styles.length}`;};styleProgress();
+    panel.querySelector('#v3-form').onchange=e=>{const t=e.target;a.reviewed=false;a.selected=[];delete a.recommendation;
+      if(profileStep===0){let values=p.exposure||[];if(t.value==='EX-NONE')values=t.checked?['EX-NONE']:[];else values=t.checked?[...values.filter(v=>v!=='EX-NONE'),t.value]:values.filter(v=>v!==t.value);p.exposure=[...new Set(values)];panel.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=p.exposure.includes(x.value));counter();}
+      else if(profileStep===1){if(t.value)p.interests[t.dataset.interest||t.id]=Number(t.value);else delete p.interests[t.dataset.interest||t.id];}
+      else {p.styles[t.name]=t.value;t.closest('.work-style-question')?.classList.remove('is-missing');styleProgress();}save();};
+    const focusHeading=()=>{panel.querySelector('h2').focus();window.scrollTo({top:0,behavior:'instant'});};
+    panel.querySelectorAll('[data-profile-step]').forEach(b=>b.onclick=()=>{profileStep=Number(b.dataset.profileStep);profile();focusHeading();});
+    panel.querySelector('#v3-back')?.addEventListener('click',()=>{profileStep--;profile();focusHeading();});
+    panel.querySelector('#v3-next').onclick=()=>{const done=profileStep===0?p.exposure?.length:profileStep===1?B.interests.every(i=>p.interests[i.id]):B.styles.every(i=>p.styles[i.id]);if(!done){error('Answer each item in this section before continuing.');if(profileStep===2){const missing=B.styles.find(i=>!p.styles[i.id]);const question=panel.querySelector(`[data-style-question="${missing.id}"]`);question?.classList.add('is-missing');question?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'center'});question?.querySelector('input')?.focus({preventScroll:true});}return;}if(profileStep===2)go('review.html');else{profileStep++;profile();focusHeading();}};
+    window.NorthStarProfileMotion?.();
+  }
+  function review(){
+    if(a.submittedAt)return go('skills-results.html');
+    if(!profileDone())return shell('Complete your profile first','<a class="button button-primary" href="assessment.html">Continue profile →</a>');
+    const heading=(title,step,label)=>`<div class="review-section-heading"><h3>${title}</h3><a href="assessment.html?step=${step}" aria-label="Edit ${label}">Edit</a></div>`;
+    const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4 10-10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    shell('Review your profile',`<div class="review-summary"><p class="review-intro">Check your answers before starting the skills assessment. You can edit each section below.</p><section class="v3-card">${heading('Completed experiences',0,'experiences')}<ul class="review-experiences">${B.exposure.filter(i=>a.profile.exposure.includes(i.id)).map(i=>`<li>${check}<span>${esc(i.label)}</span></li>`).join('')}</ul></section><section class="v3-card">${heading('Your reported interests',1,'interests')}<p class="review-helper">Your interest in these activities, rated from 1 to 5.</p><div class="review-interests">${careers.map(c=>{const mean=B.interests.filter(i=>i.career===c).reduce((s,i)=>s+a.profile.interests[i.id],0)/3;return `<div class="review-interest"><div class="review-interest-label"><strong>${esc(c)}</strong><span>${mean.toFixed(1)} <span class="review-scale">/ 5</span></span></div><div class="review-interest-track" aria-hidden="true"><span style="width:${mean/5*100}%"></span></div></div>`;}).join('')}</div></section><section class="v3-card">${heading('Work preferences',2,'work preferences')}<dl class="review-preferences">${B.styles.map(i=>`<div><dt>${esc(i.construct)}</dt><dd>${esc(i[a.profile.styles[i.id]])}</dd></div>`).join('')}</dl></section>${status}<div class="v3-actions"><a href="assessment.html">← Back to profile</a>${button('Start skills assessment →','v3-start')}</div></div>`);
+    panel.querySelector('#v3-start').onclick=()=>{a.reviewed=true;save();go('skills-assessment.html');};
+  }
+  function inputFor(i){const v=a.responses[i.id];if(i.type==='Knowledge MCQ')return `<fieldset><legend class="sr-only">Choose one answer</legend>${i.options.split('\n').map(line=>{const code=line.trim()[0];return `<label class="v3-option"><input type="radio" name="answer" value="${code}" ${v===code?'checked':''}><span>${esc(line)}</span></label>`;}).join('')}</fieldset>`;
+    if(fields[i.id])return fields[i.id].map(k=>{const label=k.replaceAll('_',' ');if(i.fieldOptions?.[k])return `<label class="v3-rating"><span>${label}</span><select data-field="${k}"><option value="">Choose a repair decision</option>${i.fieldOptions[k].map(([code,text])=>`<option value="${esc(code)}" ${v?.[k]===code?'selected':''}>${esc(text)}</option>`).join('')}</select></label>`;if(i.id==='OB-CS09')return `<label class="v3-rating"><span>${label}</span><select data-field="${k}"><option value="">Choose permissions</option>${[['none',[]],['read',['read']],['update',['update']],['both',['read','update']]].map(([name,set])=>`<option value="${name}" ${Array.isArray(v?.[k])&&JSON.stringify([...v[k]].sort())===JSON.stringify([...set].sort())?'selected':''}>${name==='both'?'Read and update':name==='none'?'No access':name}</option>`).join('')}</select></label>`;
+      if(k==='cleaned_rows')return `<label class="v3-rating"><span>Cleaned rows as JSON (id and minutes)</span><textarea data-field="${k}" rows="4" maxlength="5000" placeholder='[{"id":"...","minutes":0}]'>${esc(typeof v?.[k]==='string'?v[k]:v?.[k]?JSON.stringify(v[k]):'')}</textarea></label>`;
+      return `<label class="v3-rating"><span>${label}</span><input data-field="${k}" type="${['OB-NW09','OB-NW10'].includes(i.id)?'text':'number'}" ${['OB-NW09','OB-NW10'].includes(i.id)?'maxlength="32"':'min="0" step="any"'} value="${esc(v?.[k]??'')}"></label>`;}).join('');
+    return `<label for="v3-answer">${i.type==='Written scenario'?'Your reasoning':'Your '+i.type.replace(' task','').toLowerCase()+' source'}</label><textarea id="v3-answer" rows="${i.type==='Written scenario'?8:12}" maxlength="${i.type==='Written scenario'?4000:20000}" spellcheck="false">${esc(v||'')}</textarea>`;
+  }
+  function taskExamples(item,text){
+    if(item.id!=='OB-SD10')return `<p class="v3-prompt">${esc(text)}</p>`;
+    return '<p class="v3-prompt">Observed failures: the original function counts missing values and drops a real zero. An empty array also produces an invalid average.</p><h3 class="task-examples-heading">Expected examples</h3><div class="task-examples"><p><code>[0, 10, null]</code><span>Expected output</span><code>{count: 2, total: 10, average: 5}</code></p><p><code>[]</code><span>Expected output</span><code>{count: 0, total: 0, average: null}</code></p></div><p class="task-example-note">Other valid inputs are also checked.</p>';
+  }
+  function questionPrompt(item){
+    const lines=item.prompt.split('\n'),start=lines.findIndex(line=>/^function\s/.test(line)),end=start<0?-1:lines.findIndex((line,n)=>n>start&&line.trim()==='}');
+    if(start<0||end<0)return `<p class="v3-prompt">${esc(item.prompt)}</p>`;
+    const code=lines.slice(start,end+1).map(line=>line.replace(/return \{count: ([^,]+), total, average: ([^}]+)\};/, 'return {\n    count: $1,\n    total,\n    average: $2\n  };').replace(/(const total = .*\.reduce)\(\(sum, score\) => sum \+ score, 0\);/, '$1(\n    (sum, score) => sum + score,\n    0\n  );')).join('\n');
+    const highlighted=code.replace(/("[^"\n]*"|'[^'\n]*'|\b(?:function|let|const|for|return|if|else|null|true|false)\b|\b\d+\b)|([^"'\w\s]+|\w+|\s+|.)/g,(match,token)=>token?`<span class="code-${/^['"]/.test(token)?'string':/^\d/.test(token)?'number':'keyword'}">${esc(token)}</span>`:esc(match));
+    return `<p class="v3-prompt">${esc(lines.slice(0,start).join('\n'))}</p><pre class="question-code" tabindex="0" aria-label="JavaScript example"><code>${highlighted}</code></pre>${end<lines.length-1?taskExamples(item,lines.slice(end+1).join('\n')):''}`;
+  }
+  function skills(){
+    if(a.submittedAt)return go('skills-results.html');
+    if(!testMode&&(!profileDone()||!a.reviewed))return shell('Review your profile first','<a class="button button-primary" href="review.html">Review profile →</a>');
+    if(testMode){if(testReview)return finish();if(!testItems.includes(B.items[a.stage]))a.stage=B.items.indexOf(testItems[0]);}
+    else if(a.stage===48)return finish();
+    const i=B.items[a.stage],grade=a.scores?.grades[i.id],position=testMode?testItems.indexOf(i):a.stage,total=testMode?6:48;
+
+    const coding=/task$/i.test(i.type)&&!fields[i.id],split=coding||i.type==='Written scenario';
+    document.body.classList.toggle('coding-question',coding);
+    document.body.classList.toggle('written-question',i.type==='Written scenario');
+    shell(i.id==='OB-SD10'?'Repair score handling':i.competency,`<div class="v3-stage"><span>${esc(i.career)} · ${esc(i.type)}</span><span>${testMode?'Separate '+testMode+' test · ':''}Item ${position+1} of ${total}</span></div><progress max="${total}" value="${position}" aria-label="Assessment progress"></progress>${split?'<div class="coding-layout"><section class="coding-instructions" aria-label="Task instructions">':''}${questionPrompt(i)}${split?'</section><section class="coding-solution" aria-label="Your solution">':''}<form id="v3-form" class="question-form ${coding?'code-source-form':''}">${inputFor(i)}</form>${i.criteria?`<details ${i.type==='Written scenario'?'open':''}><summary>${i.type==='Written scenario'?'Scoring criteria':'How this is checked'} · ${i.maximum} points</summary><p class="v3-prompt">${esc(i.criteria)}</p>${i.type==='Coding task'?'<p>The checker supports local variables, arrays, plain objects, loops, and filter/map/reduce/forEach callbacks. Invalid JavaScript or a missing required function earns 0/4. Valid solutions using unsupported checker features receive AI rubric assessment at final submission, labelled execution not verified. External packages are unavailable.</p>':''}${i.type==='Written scenario'?'<p>AI awards each criterion separately using evidence from your answer. Failed grading remains pending and can be retried.</p>':''}</details>`:''}${i.maximum===4&&testMode?button(i.type==='Written scenario'?'Check this scenario':'Check this task','v3-check',false):''}${grade?.status==='grading_error'?`<p class="v3-note">Checker could not score this response: ${esc(grade.error)}</p>`:''}${status}${split?'</section></div>':''}<div class="v3-actions exam-navigation"><button type="button" class="question-back" id="v3-back">← Back</button><span class="exam-save-status" aria-live="polite"></span>${button('Next →','v3-next')}</div><details class="question-details"><summary>Question details and navigation</summary><p>Item reference: ${esc(i.id)}</p><select id="v3-jump"><option value="">Choose an item</option>${(testMode?testItems:B.items).map((item,n)=>`<option value="${B.items.indexOf(item)}">${n+1}. ${item.id} — ${esc(item.competency)}${filled(item)?' · answered':''}</option>`).join('')}</select></details>`);
+    const details=panel.querySelector('.question-details'),criteria=panel.querySelector('.coding-solution>details');
+    if(criteria&&details){criteria.querySelector('summary').remove();details.querySelector('summary').textContent=`Details · ${i.maximum} points`;details.insertBefore(criteria,details.children[1]);criteria.removeAttribute('open');criteria.outerHTML=criteria.innerHTML;panel.querySelector('.coding-instructions').appendChild(details);}
+    const reasoning=panel.querySelector('#v3-answer');
+    if(i.type==='Written scenario'&&reasoning){
+      reasoning.rows=6;
+      reasoning.placeholder=i.id==='OB-SD04'?'Defect:\n\nCorrection:\n\nNormal test and expected result:\n\nBoundary test and expected result:':'Explain your reasoning and address each part of the question. See Details for the scoring criteria.';
+      const grow=()=>{reasoning.style.height='auto';reasoning.style.height=Math.max(160,reasoning.scrollHeight)+'px';};
+      reasoning.addEventListener('input',grow);grow();
+    }
+    const saved=document.getElementById('storage-status'),saveLabel=panel.querySelector('.exam-save-status');
+    if(saved&&saveLabel){saveLabel.textContent=saved.textContent;if(typeof MutationObserver!=='undefined'){window.examSaveObserver?.disconnect();window.examSaveObserver=new MutationObserver(()=>{saveLabel.textContent=saved.textContent;});window.examSaveObserver.observe(saved,{childList:true,characterData:true,subtree:true});}}
+    const changed=e=>{const t=e.target;if(i.type==='Knowledge MCQ')a.responses[i.id]=t.value;else if(fields[i.id]){a.responses[i.id]||={};let v=t.value;if(i.id==='OB-CS09'){if(!v)delete a.responses[i.id][t.dataset.field];else a.responses[i.id][t.dataset.field]={none:[],read:['read'],update:['update'],both:['read','update']}[v];}else a.responses[i.id][t.dataset.field]=['OB-DA09','OB-DA10'].includes(i.id)&&t.dataset.field!=='cleaned_rows'?(v===''?'':Number(v)):v;}else a.responses[i.id]=t.value;invalidate(i.id);};
+    panel.querySelector('#v3-form').addEventListener('input',changed);
+    const check=panel.querySelector('#v3-check');if(check)check.onclick=async()=>{if(!filled(i))return error('Complete the task before checking it.');check.disabled=true;error('Checking this task…');try{const r=await request(i.type==='Written scenario'?'grade':'score'),g=r.grades[i.id];error(g.status==='graded'?`${g.points} / 4 points. Criteria: ${g.criteria.map((n,k)=>`C${k+1} ${n?'passed':'not passed'}`).join(', ')}.${g.feedback?' '+g.feedback:''}`:g.error||'This task remains unscored.');}catch(e){error(e.message);}finally{check.disabled=false;}};
+    panel.querySelector('#v3-back').onclick=()=>{if(testMode){if(position){a.stage=B.items.indexOf(testItems[position-1]);save();skills();}else go('assessment.html?bank=v3');return;}if(a.stage){a.stage--;save();skills();}else go('review.html');};
+    panel.querySelector('#v3-next').onclick=()=>{if(!filled(i))return error('Complete this response before continuing.');if(testMode){if(position===5)testReview=true;else a.stage=B.items.indexOf(testItems[position+1]);}else a.stage++;save();skills();panel.querySelector('h2')?.focus();window.scrollTo({top:0,behavior:'instant'});};
+    panel.querySelector('#v3-jump').onchange=e=>{if(e.target.value!==''){a.stage=Number(e.target.value);save();skills();}};
+  }
+  function finish(){
+    if(testMode)return testFinish();
+    const missing=B.items.filter(i=>!filled(i));
+    shell('Review your saved work',`<p>${48-missing.length} of 48 skill items answered.</p>${missing.length?`<p>Unanswered: ${missing.map(i=>esc(i.id)).join(', ')}</p>`:''}<p>Submit when you are ready. We will check your knowledge and practical work and grade all six written answers together and review your coding responses. Your answers stay saved if grading is unavailable.</p>${status}<div class="v3-actions">${a.submittedAt?'':button('← Review answers','v3-back',false)}${button('Submit assessment →','v3-finish')}</div>`);
+    if(panel.querySelector('#v3-back'))panel.querySelector('#v3-back').onclick=()=>{a.stage=0;save();skills();};
+    panel.querySelector('#v3-finish').onclick=async()=>{
+      if(missing.length)return error('Answer all skill items before submitting.');
+      const submit=panel.querySelector('#v3-finish'),back=panel.querySelector('#v3-back');
+      submit.disabled=true;if(back)back.disabled=true;submit.textContent='Grading assessment…';
+      try{
+        error('Saving and checking your knowledge and practical work…');await request('submit');
+        error('Grading written answers and reviewing coding responses together. Please wait…');await request('grade');
+        go('skills-results.html');
+      }catch(e){error(e.message+' Grading remains pending where incomplete. Retry submission to finish.');submit.disabled=false;if(back)back.disabled=false;submit.textContent='Retry submission →';}
+    };
+  }
+  function bar(part){if(!part||part.points===null)return '<span class="v3-pending">Pending / incomplete</span>';return `<div class="v3-score"><span>${part.points} / ${part.maximum}</span><progress value="${part.points}" max="${part.maximum}" aria-label="${part.points} of ${part.maximum} points"></progress></div>`;}
+  function studentFeedback(text){
+    if(!text)return '';
+    if(text==='Submit one function summarizeScores(scores).')return 'We couldn’t find the required function. Submit your complete JavaScript function named summarizeScores with one scores parameter.';
+    return text.replace(/The student response did not provide/gi,'Your answer did not include').replace(/The student response/gi,'Your answer').replace(/The student failed to/gi,'You did not').replace(/The student/gi,'You');
+  }
+  function scoreCell(part,career,component){
+    return `<button type="button" class="score-help" data-career="${esc(career)}" data-component="${component}" aria-label="Explain ${esc(career)} ${component} score">${bar(part)}<span class="score-help-icon" aria-hidden="true">!</span></button>`;
+  }
+  function showScoreFeedback(career,component){
+    const dialog=panel.querySelector('#score-explanation'),body=dialog.querySelector('.score-dialog-body');
+    const items=B.items.filter(i=>i.career===career&&(component==='knowledge'?i.type==='Knowledge MCQ':component==='written'?i.type==='Written scenario':i.maximum===4&&i.type!=='Written scenario'));
+    dialog.querySelector('h3').textContent=career+' · '+component.charAt(0).toUpperCase()+component.slice(1);
+    body.innerHTML=items.map(i=>{
+      const g=a.scores?.grades?.[i.id],invalid=g?.feedback==='Submit one function summarizeScores(scores).';
+      const feedback=studentFeedback(g?.feedback||g?.aiFeedback||g?.error);
+      const criteria=(i.criteria||'').split('\n').filter(Boolean);
+      return `<section class="score-explanation-item"><h4>${esc(i.id==='OB-SD10'?'Repair score handling':i.competency)}</h4><p class="score-explanation-total">${g?.status==='graded'?g.points+' / '+i.maximum+' points':'Not graded yet'}</p>${g?.gradingMethod==='ai-fallback'?'<p>AI assessed this solution by reading it. Your code was not executed.</p>':''}${feedback?`<p>${esc(feedback)}</p>`:''}${g?.status!=='graded'?'<p>This score stays pending until grading succeeds. It is not counted as zero.</p>':''}${i.type==='Knowledge MCQ'?`<p>${g?.status==='graded'?(g.points?'Your selected answer was correct.':'Your selected answer was incorrect.'):'Your answer has not been checked yet.'}</p>`:!invalid&&g?.criteria?`<ul class="score-criteria">${g.criteria.map((n,k)=>`<li><strong>${n?'Met':'Not met'}</strong> — ${esc((criteria[k]||'Criterion '+(k+1)).replace(/^C\d+\s*\(1\):?\s*/,''))}${g.evidence?.[k]?`<blockquote>From your answer: “${esc(g.evidence[k])}”</blockquote>`:''}</li>`).join('')}</ul>`:''}<details><summary>Your submitted answer</summary><pre class="score-submitted">${esc(typeof a.responses[i.id]==='object'?JSON.stringify(a.responses[i.id],null,2):a.responses[i.id]||'No answer submitted.')}</pre></details></section>`;
+    }).join('');
+    dialog.showModal();
+  }
+  function results(){
+    if(testMode)return testResults();
+    if(!skillsDone())return shell('Complete your skill responses first','<a class="button button-primary" href="skills-assessment.html">Continue assessment →</a>');
+    const scores=a.scores,rows=scores?.careers;
+    const writtenPending=B.items.some(i=>i.type==='Written scenario'&&scores?.grades?.[i.id]?.status!=='graded');
+    shell('Your assessment evidence',`<p>Compare your knowledge, practical work, and written reasoning across six career areas. These small item sets do not establish professional proficiency.</p><div class="v3-score-table"><div class="v3-score-header"><span>Career area</span><span>Knowledge / 6</span><span>Practical / 4</span><span>Written / 4</span></div>${careers.map(c=>{const r=rows?.find(r=>r.career===c);return `<section class="v3-score-row"><h3>${esc(c)}</h3><div><small>Knowledge</small>${scoreCell(r?.knowledge,c,'knowledge')}</div><div><small>Practical</small>${scoreCell(r?.practical,c,'practical')}</div><div><small>Written</small>${scoreCell(r?.written,c,'written')}</div></section>`;}).join('')}</div>${status}<div class="v3-actions">${button('Retry objective checks','v3-score',false)}${writtenPending?button('Retry written grading','v3-grade'):''}</div><p class="v3-note">Select a score or its ! icon to see what you met and what to improve. AI feedback can make mistakes; compare it with your submitted answer.</p><dialog id="score-explanation" class="score-dialog" aria-labelledby="score-explanation-title"><div class="score-dialog-heading"><h3 id="score-explanation-title">Score explanation</h3><form method="dialog"><button type="submit" class="score-dialog-close">Close</button></form></div><div class="score-dialog-body"></div></dialog>${a.submittedAt?'<p>Your submitted answers are locked. Select a score to view your answer and feedback.</p>':'<p>Finalize this assessment to lock your answers.</p><button type="button" id="v3-finalize" class="button button-primary">Finalize submission →</button>'}<div class="v3-actions">${button('Download responses','v3-download',false)}<a class="button button-primary" href="results.html">See career suggestions →</a></div>`);
+    const finalize=panel.querySelector('#v3-finalize');if(finalize)finalize.onclick=async()=>{finalize.disabled=true;try{await request('submit');results();error('Your submitted answers are now locked. Retry grading if any scores remain pending.');}catch(e){error(e.message);finalize.disabled=false;}};
+    panel.querySelectorAll('.score-help').forEach(button=>{button.onclick=()=>showScoreFeedback(button.dataset.career,button.dataset.component);});
+    for(const [id,route]of [['v3-score','score'],['v3-grade','grade']].filter(([id])=>panel.querySelector('#'+id)))panel.querySelector('#'+id).onclick=async()=>{const b=panel.querySelector('#'+id);b.disabled=true;error(route==='grade'?'Checking written responses against the rubric…':'Running objective checks…');try{await request(route);results();error('Scores updated.');}catch(e){error(e.message);b.disabled=false;}};
+    panel.querySelector('#v3-download').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(a,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='northstar-assessment-v'+B.version+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+  }
+  function testFinish(){
+    const missing=testItems.filter(i=>!filled(i));
+    shell(testMode==='practical'?'Review your practical test':'Review your written test',`<p>${6-missing.length} of 6 responses ready. You do not need to answer the other tests.</p>${status}<div class="v3-actions">${button('← Review this test','v3-test-back',false)}${button('Check scores →','v3-test-score')}</div>`);
+    panel.querySelector('#v3-test-back').onclick=()=>{testReview=false;a.stage=B.items.indexOf(testItems[0]);save();skills();};
+    panel.querySelector('#v3-test-score').onclick=async()=>{if(missing.length)return error('Complete these six responses first.');const b=panel.querySelector('#v3-test-score');b.disabled=true;error('Checking this test…');try{await request(testMode==='written'?'grade':'score');go('skills-results.html?bank=v3&test='+testMode);}catch(e){error(e.message);b.disabled=false;}};
+  }
+  function testResults(){
+    shell(testMode==='practical'?'Practical test scores':'Written scenario scores',`<p>Only this set is shown. Each item is scored out of four points.</p>${testItems.map(i=>{const g=a.scores?.grades?.[i.id];return `<section class="v3-card"><h3>${esc(i.career)} · ${i.id}</h3><p>${g?.status==='graded'?g.points+' / 4':esc(g?.status||'unanswered')}</p>${g?.criteria?`<ol>${g.criteria.map((n,k)=>`<li>C${k+1}: ${n} / 1${g.evidence?.[k]?' — “'+esc(g.evidence[k])+'”':''}</li>`).join('')}</ol>`:''}${g?.feedback?'<p>'+esc(g.feedback)+'</p>':''}${g?.error?'<p>'+esc(g.error)+'</p>':''}<details><summary>Your response and scoring criteria</summary><pre class="v3-prompt">${esc(typeof a.responses[i.id]==='object'?JSON.stringify(a.responses[i.id],null,2):a.responses[i.id]||'No response yet.')}</pre><p class="v3-prompt">${esc(i.criteria)}</p></details></section>`;}).join('')}${status}<div class="v3-actions"><a href="skills-assessment.html?bank=v3&test=${testMode}">← Edit this test</a>${button('Recheck this test','v3-test-retry')}</div>`);
+    panel.querySelector('#v3-test-retry').onclick=async()=>{const b=panel.querySelector('#v3-test-retry');b.disabled=true;try{await request(testMode==='written'?'grade':'score');testResults();error('Scores updated.');}catch(e){error(e.message);b.disabled=false;}};
+  }
+  const interestMean=c=>{const items=B.interests.filter(i=>i.career===c);return items.every(i=>a.profile.interests[i.id])?(items.reduce((sum,i)=>sum+a.profile.interests[i.id],0)/items.length).toFixed(1):'Not answered';};
+  function pathOptions(){return `<fieldset class="rf-paths"><legend>Choose up to three directions for your plan</legend>${careers.map(c=>`<label class="v3-option"><input type="checkbox" value="${esc(c)}" ${a.selected.includes(c)?'checked':''}><span><strong>${esc(c)}</strong><br>Interest: ${interestMean(c)} / 5</span></label>`).join('')}</fieldset>`;}
+  function bindPaths(){
+    const updatePlan=()=>{const label=panel.querySelector('#plan-directions');if(label)label.textContent=a.selected.length?'Plan for: '+a.selected.join(', '):'Choose at least one direction for your plan.';};
+    const changed=e=>{
+      const t=e.target;if(t.type!=='checkbox')return;
+      if(t.checked&&!a.selected.includes(t.value)&&a.selected.length===3){t.checked=false;return error('Choose up to three paths.');}
+      a.selected=t.checked?[...new Set([...a.selected,t.value])]:a.selected.filter(c=>c!==t.value);
+      panel.querySelectorAll('#v3-paths input,#v3-other-paths input').forEach(input=>{input.checked=a.selected.includes(input.value);});
+      save();updatePlan();error(`${a.selected.length} of 3 paths selected.`);
+    };
+    for(const id of ['v3-paths','v3-other-paths']){const form=panel.querySelector('#'+id);if(form)form.onchange=changed;}
+    updatePlan();
+    panel.querySelector('#v3-plan').onclick=()=>a.selected.length?go('next-steps.html'):error('Choose at least one path to explore.');
+  }
+  async function choose(){
+    if(!skillsDone())return results();
+    shell('Your career suggestions','<p role="status">Comparing your graded assessment with the trained career model…</p>');
+    try{
+      await window.AstraStorage.flush();
+      const stamp=JSON.stringify({profile:a.profile,responses:a.responses});
+      const response=await fetch('/api/v3/recommend',{method:'POST',headers:{'Content-Type':'application/json','X-Astra-Assessment':window.AstraStorage.recordId},body:JSON.stringify({bankVersion:B.version}),signal:AbortSignal.timeout(20000)});
+      let r;try{r=await response.json();}catch{throw Error('Career suggestions could not be loaded. Your answers are saved; retry shortly.');}
+      if(!response.ok)throw Object.assign(Error(r.error||'Career suggestions are unavailable. Your answers are saved.'),{code:r.code});
+      if(stamp!==JSON.stringify({profile:a.profile,responses:a.responses}))throw Error('Your answers changed while suggestions were loading. Retry with the updated assessment.');
+      if(r.bankVersion!==B.version||!Array.isArray(r.topThree)||r.topThree.length!==3||r.topThree.some(x=>!x||!careers.includes(x.career)||!Number.isFinite(x.probability)||x.probability<0||x.probability>1)||new Set(r.topThree.map(x=>x.career)).size!==3||!Array.isArray(r.mapping?.evidence)||r.mapping.evidence.length!==6||r.mapping.evidence.some(x=>!x||!careers.includes(x.career)||!Number.isInteger(x.points)||x.points<0||x.points>14)||!Number.isFinite(r.mapping.parameters?.objectiveScale)||!Number.isFinite(r.mapping.parameters?.exposureBonus))throw Error('The server returned an invalid career result. Retry after the server is checked.');
+      const hadRecommendation=!!a.recommendation;a.recommendation=r;if(!a.selected.length&&!hadRecommendation)a.selected=r.topThree.map(x=>x.career);save();
+      const descriptions={'Software Development':'Create applications and improve how software works.','Networking':'Connect devices and troubleshoot communication between systems.','Cybersecurity':'Protect systems, investigate threats, and manage access.','Data Science and Analytics':'Explore data and communicate useful findings.','Database Administration':'Organize data and maintain reliable databases.','UI/UX and Web Development':'Design accessible interfaces and build web experiences.'};
+      const summary=(r.summary?.text||`${r.topThree[0].career} ranks first among your career suggestions. Try an introductory activity and review your scores to choose what to practice next.`).replace(/\bpractise\b/g,'practice');
+      const ranking=r.topThree.map((item,n)=>{
+        const evidence=r.mapping.evidence.find(x=>x.career===item.career);
+        return `<li class="rf-result career-card"><div class="career-card-rank"><span>Suggestion ${n+1}</span>${n===0?'<span class="top-model-match">Top model match</span>':''}</div><h3>${esc(item.career)}</h3><div class="career-match"><strong>${(item.probability*100).toFixed(1)}%</strong><span>model match</span></div><div class="career-match-track" aria-hidden="true"><span style="width:${item.probability*100}%"></span></div><p class="career-description">${esc(descriptions[item.career])}</p><p class="career-input-evidence"><strong>Your assessment evidence</strong><br>${evidence.points} of 14 points · ${evidence.reportedExposure?'experience reported':'no experience reported'}</p><div class="career-first-step"><h4>Try first</h4><p>${esc(practice[item.career][0])}</p></div><button type="button" class="podium-breakdown" data-career="${esc(item.career)}" aria-label="View breakdown for ${esc(item.career)}">View score breakdown →</button><label class="career-plan-choice"><input type="checkbox" value="${esc(item.career)}" ${a.selected.includes(item.career)?'checked':''}><span>Add to my plan</span></label></li>`;
+      }).join('');
+      shell('Your career suggestions',`<p class="career-summary">${esc(summary)}</p><p class="career-summary-label">${r.summary?.source==='ai'?'AI explanation of your results':'Result summary'}</p><aside class="career-preliminary" aria-label="Preliminary recommendations"><strong>Preliminary</strong><p>The student mapping is awaiting professor review. These suggestions help you explore careers; they do not certify your skills or predict career success.</p></aside><p class="career-match-note">Model match reflects the RF’s support for a category. It is not your skill score or chance of career success. Reported interests do not affect this ranking.</p><form id="v3-paths"><ol class="rf-ranking career-cards">${ranking}</ol></form><div class="career-plan-action"><p id="plan-directions" aria-live="polite"></p>${button('Build my exploration plan →','v3-plan')}</div><dialog id="career-breakdown" class="score-dialog" aria-labelledby="career-breakdown-title"><div class="score-dialog-heading"><h3 id="career-breakdown-title"></h3><form method="dialog"><button class="score-dialog-close">Close</button></form></div><div class="career-breakdown-body"></div></dialog><details class="rf-method"><summary>How these suggestions were made</summary><p>Each career combines knowledge, practical and written points out of 14. That total is scaled to 0–${r.mapping.parameters.objectiveScale}, with ${r.mapping.parameters.exposureBonus} added for reported experience. The six values are normalized and passed to the trained Random Forest. Interests and work preferences add context without changing its ranking.</p><p>Model match is not a probability of career success. Your overall scores are shown separately because relative career mix does not measure overall ability.</p><p>Model: ${esc(r.modelVersion)} · Mapping: ${esc(r.mapping.version)} · Bank: ${esc(r.bankVersion)}</p></details><form id="v3-other-paths"><details><summary>Explore other directions for my plan</summary>${pathOptions()}</details></form>${status}<div class="v3-actions"><a href="skills-results.html">← Review my skill evidence</a></div>`);
+      panel.querySelectorAll('.podium-breakdown').forEach(button=>{button.onclick=()=>{
+        const career=button.dataset.career,row=a.scores?.careers?.find(x=>x.career===career),e=r.mapping.evidence.find(x=>x.career===career),dialog=panel.querySelector('#career-breakdown');
+        dialog.querySelector('h3').textContent=career;
+        dialog.querySelector('.career-breakdown-body').innerHTML=`<p>Assessment evidence: <strong>${e.points} / 14</strong></p>${row?['knowledge','practical','written'].map(part=>`<p>${part.charAt(0).toUpperCase()+part.slice(1)}: ${row[part].points===null?'Pending':row[part].points+' / '+row[part].maximum}</p>`).join(''):''}<p>Prior experience: ${e.reportedExposure?'Reported':'Not reported'}</p><p>Your reported interest: ${interestMean(career)} / 5. This does not influence the RF ranking.</p><a href="skills-results.html">View assessment feedback →</a>`;
+        dialog.showModal();
+      };});
+      bindPaths();
+    }catch(e){
+      const empty=e.code==='insufficient_evidence';
+      const message=e.name==='TimeoutError'?'Career suggestions took too long. Your answers are saved; retry shortly.':e.name==='TypeError'?'Could not reach the assessment server. Your answers are kept in this tab; reconnect and retry.':e.message;
+      shell(empty?'Choose an activity to begin with':e.code==='incomplete'?'Finish grading to see your suggestions':'Career suggestions are unavailable',`<p role="alert">${esc(message)}</p>${empty?'<p>The model has no evidence to rank these careers yet. You can choose a practice direction yourself.</p><form id="v3-paths">'+pathOptions()+'</form>':''}${status}<div class="v3-actions"><a class="button button-outline" href="skills-results.html">Review scores and written grading</a>${button(empty?'Build my exploration plan →':'Retry career suggestions',empty?'v3-plan':'rf-retry')}</div>`);
+      if(empty)bindPaths();else panel.querySelector('#rf-retry').onclick=choose;
+    }
+  }
+  const practice={
+    'Software Development':['Build a small score-summary tool','Use a local JavaScript file to implement the task, add empty, missing, zero and fractional examples, and explain one bug you fixed.'],
+    'Networking':['Document a simulated network configuration','Use a network simulator or paper diagram. Assign a valid host address, mask, gateway and DNS, then write the checks you would use to verify each.'],
+    'Cybersecurity':['Review access rules in an authorized practice lab','Write a permission table for draft and submitted records. Explain why each permission is needed and test that other students cannot access a record.'],
+    'Data Science and Analytics':['Clean and explain a small dataset','Use a spreadsheet or notebook to remove duplicates and handle missing values. Show before/after rows and explain how cleaning changes a summary.'],
+    'Database Administration':['Build and query a local practice database','Create a small SQLite database, group orders by customer, and test totals below, at and above a threshold. Keep all work in your practice database.'],
+    'UI/UX and Web Development':['Build and test an accessible form','Create a labelled email input and native submit button. Check keyboard use and ask a peer to complete the task without guidance.']
+  };
+  function plan(){
+    if(!skillsDone()||!a.selected.length)return choose();
+    if(!window.NorthStarLearning)return shell('Your plan is loading','<p>Refresh to load the learning resources.</p>');
+    shell('Your exploration plan',`<p>Choose where to begin with resources and activities matched to your assessment scores.</p><details class="learning-rules"><summary>How learning starting points are chosen</summary><p>Foundations: 0–5 of 14 points. Build your skills: 6–10. Explore a challenge: 11–14. These are provisional resource-selection rules, not validated proficiency levels. We also compare knowledge, practical, and written scores as proportions of their maximums to suggest a focus. Equal scores prioritize practical work, then written reasoning.</p></details>${a.selected.map((career,n)=>{
+      const row=a.scores?.careers?.find(x=>x.career===career),learning=window.NorthStarLearning.recommend(career,row),resource=learning.resource;
+      const aiAssessed=B.items.some(i=>i.career===career&&a.scores?.grades?.[i.id]?.gradingMethod==='ai-fallback');
+      return `<section class="learning-path" aria-labelledby="learning-career-${n}"><div class="learning-path-heading"><h3 id="learning-career-${n}">${esc(career)}</h3><span class="learning-start">${esc(learning.label)}</span></div><p class="learning-score">${learning.points===null?'Your starting point awaits complete grading.':`Based on your assessment score of ${learning.points} / 14.`}</p>${aiAssessed?'<p class="learning-score">Your total includes AI-assessed code that was not executed; this starting point is provisional.</p>':''}<p class="learning-focus">${esc(learning.focus)}</p><div class="learning-steps"><section><h4>Learn</h4><h5>${esc(resource.title)}</h5><p class="learning-resource-meta">${esc(resource.provider)} · ${esc(resource.access)}</p><p>Focus on ${esc(learning.topic)}.</p><p class="learning-prerequisite">${esc(resource.prerequisite)}</p><a class="button button-outline" href="${esc(resource.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(resource.title)} from ${esc(resource.provider)} in a new tab">Open resource →</a><small>Opens in a new tab</small></section><section><h4>Practice</h4><p>${esc(learning.activity)}</p><p><strong>Keep:</strong> your work, test results, and a short explanation of what you learned.</p></section></div><details class="learning-reflection"><summary>Reflect on what you learned · optional</summary><label for="reflection-${n}">What did you try, what changed, and what would you practice next?</label><textarea id="reflection-${n}" data-career="${esc(career)}" rows="3" maxlength="2000">${esc(a.reflections[career]||'')}</textarea></details></section>`;
+    }).join('')}<p class="v3-note">These external resources support practice. Completion does not change your submitted assessment scores.</p><div class="v3-actions"><a href="results.html">← Change selected paths</a><a class="button button-primary" href="index.html">Return home →</a></div>`);
+    panel.querySelectorAll('textarea[data-career]').forEach(t=>{t.oninput=()=>{a.reflections[t.dataset.career]=t.value;save();};});
+  }
+  if(page==='assessment')profile();else if(page==='review')review();else if(page==='skills-assessment')skills();else if(page==='skills-results')results();else if(page==='results')choose();else if(page==='next-steps')plan();else shell('V3 is a draft practice assessment','<p>A certificate is not issued for this unvalidated pilot bank.</p><a href="skills-results.html">View your assessment evidence →</a>');
+})();

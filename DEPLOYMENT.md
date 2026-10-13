@@ -1,0 +1,44 @@
+# Render Free + Supabase Free
+
+## Deployment record — October 13, 2026
+
+- Public site: https://northstar-x96p.onrender.com
+- Render service: `srv-db72vtaj9qps73b1e4u0`, Node 24.19.0, Free, Singapore.
+- Supabase project: `mncmpsuwclksayfiayqv`, NorthStar, rnmdn's Org, Free, Singapore.
+- Verified live: HTTPS and health check, private server paths blocked, encrypted cloud save/reload, recovery after replacement deployments, submitted-answer edits rejected. SQL checks confirmed RLS and denied table/function access for anon and authenticated roles. All 15 records at verification were encrypted envelopes.
+- Local assessment, RF, and cloud-adapter regression checks passed.
+- Remaining issue: Google Gemini generation returned high-demand HTTP 503 and timeouts during live verification. Gemini is configured with the existing key and `gemini-3.5-flash-lite`. Written grading and the full live RF result flow have not passed while Google is unavailable; saved responses remain pending. Do not describe AI grading as successfully verified.
+- Secrets were entered only in Render configuration; no credentials or student records were committed. The temporary transfer file was removed.
+
+The existing Render service is connected to the private `rnmdn/north-star-app` repository. A public source snapshot can coexist with that deployment repository.
+
+The production server uses Supabase for encrypted assessment records. Render's local disk is ephemeral and is never used for production records. Local development continues to use the existing encrypted file store.
+
+## Initial deployment
+
+1. Create NorthStar in rnmdn's Org on Supabase Free, Singapore. Enable Data API and RLS; disable automatic table exposure.
+2. Apply `supabase/migrations/202610130001_storage.sql` in the SQL editor. It creates two private tables and server-only storage functions. The migration is repeatable.
+3. Connect Render to the private GitHub repository `rnmdn/north-star-app`. Create a Blueprint using `render.yaml`, or a Node web service with the same settings. Select Free and Singapore.
+4. Configure server environment variables:
+   - `SUPABASE_URL`: project URL.
+   - `SUPABASE_SECRET_KEY`: server-only secret key, never the publishable key.
+   - `GEMINI_API_KEY`: grading key.
+   - `GEMINI_MODEL=gemini-3.5-flash-lite`: explicit model matching the project's free quota; avoid a moving alias.
+   - `NORTHSTAR_STORAGE_KEY`: a stable base64-encoded 32-byte encryption key (the Blueprint generates it). Save a private backup of this key; losing it makes existing encrypted records unreadable.
+   - `NORTHSTAR_STORAGE=supabase`, `ASTRA_HTTPS=true`, `NODE_ENV=production`, `NODE_VERSION=24.19.0`.
+5. Build `npm ci`, start `npm start`, health path `/healthz`. Render supplies `PORT` and `RENDER_EXTERNAL_URL`. For a custom domain, set `NORTHSTAR_PUBLIC_URL` to its HTTPS origin.
+6. Verify a synthetic assessment saves, reloads after a deployment, resumes with its recovery code, and cannot edit submitted answers. Verify public/publishable Supabase access cannot read records. Verify grading and RF results before inviting students.
+
+## Data and access
+
+Only encrypted AES-256-GCM envelopes and hashed record keys are stored. Student browsers communicate with NorthStar, not Supabase. Existing session ownership, revision checks, recovery codes, and submitted-answer locks are preserved. A database lease serializes mutations across overlapping server deployments; writes verify the lease inside the database transaction. Provider failures return an error without falling back to temporary files.
+
+Existing local student records are retained in the original working folder and are not uploaded automatically. Keep the old local server available until the new deployment is verified. Rolling back the Git commit does not delete Supabase records; older code without the adapter must not be deployed to production.
+
+## Free-service limits
+
+Render Free may sleep after inactivity; the first request can take time. Supabase Free may pause inactive projects. Keep encrypted database exports and the encryption key separately; this configuration does not provide an automated backup schedule. Do not rotate the storage encryption key without re-encrypting existing records.
+
+## Verification
+
+Run `npm test`, `npm run check:rf`, and `npm run test:cloud`. Cloud tests use a fake REST service and verify encryption, persistence between instances, concurrency, and fail-closed configuration. Actual provider provisioning, RLS and restart checks must also pass on the deployed service.

@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: northstar
+    runtime: node
+    plan: free
+    region: singapore
+    numInstances: 1
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: NODE_ENV
+        value: production
+      - key: NORTHSTAR_STORAGE
+        value: supabase
+      - key: ASTRA_HTTPS
+        value: "true"
+      - key: NORTHSTAR_STORAGE_KEY
+        generateValue: true
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite

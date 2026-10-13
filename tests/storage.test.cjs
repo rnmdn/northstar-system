@@ -1,0 +1,74 @@
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs/promises');
+const path=require('node:path');
+const {createServer}=require('../server');
+const {privateStore}=require('../storage/private-store');
+const {validateState,hash}=require('../storage/assessment');
+const {backup,verify,restore}=require('../storage/maintenance');
+const objective=require('../grading/objective');
+const references=require('../grading/reference-answers.json');
+const rubric=require('../grading/rubric');
+const profile={skills:Object.fromEntries(Array.from({length:10},(_,i)=>[i,2])),exposure:[0],exposureStatus:'selected',interest:Object.fromEntries(Array.from({length:6},(_,i)=>[i,2])),style:{0:0,1:1,2:0},evidence:[{type:'course',title:'Private student course',skill:'Programming',provider:'College',reference:'',earned:'85',maximum:'100',grading:'higher',note:'Course evidence'}]};
+const written=references.sets[0].answers;
+const assessment={quizVersion:objective.bank.quizVersion,answers:Object.fromEntries(objective.bank.items.map(item=>[item.id,item.key])),practical:Object.fromEntries(written.map(item=>[item.id,item.answer])),coding:{code:'function larger(a,b){return Math.max(a,b)}',runs:1},certificate:{name:'Private student name',issuedAt:new Date().toISOString(),recordId:'test'},grades:{items:[{points:999}]},objective:{knowledge:{correct:999}}};
+const state={'astra-student-profile-v1':JSON.stringify(profile),'astra-research-pilot-v0-1':JSON.stringify(assessment),'astra-review-complete':'true','astra-skills-complete':'true'};
+test('Storage accepts partial drafts, rejects invalid data and strips client grades',()=>{
+  const clean=validateState(state);assert.equal(JSON.parse(clean['astra-research-pilot-v0-1']).grades,undefined);
+  assert.throws(()=>validateState({...state,secret:'test'}));
+  assert.throws(()=>validateState({'astra-student-profile-v1':JSON.stringify({...profile,skills:{0:4}})}));
+  assert.throws(()=>validateState({'astra-student-profile-v1':JSON.stringify({...profile,evidence:[{...profile.evidence[0],reference:'javascript:alert(1)'}]})}));
+  assert.equal(JSON.parse(validateState({'astra-student-profile-v1':JSON.stringify({...profile,skills:{},evidence:[{...profile.evidence[0],title:'',earned:''}]})})['astra-student-profile-v1']).evidence[0].title,'');
+});
+test('Students are isolated; recovery survives restart; conflicts, forged scores and cross-site writes are blocked',async()=>{
+  const root=require('node:os').tmpdir(),dir=await fs.mkdtemp(path.join(root,'storage-test-'));let server;
+  const grades=Object.keys(rubric.criteria).map(id=>({id,criteria:[1,1,1],points:3,feedback:'Reference test double.'}));
+  const provider=async()=>({grades,metadata:{modelVersion:'test-model',gradedAt:new Date().toISOString()}});
+  async function start(directory=dir){server=createServer({dataDir:directory,grade:provider,model:'test-model'});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));return `http://127.0.0.1:${server.address().port}`;}
+  const post=(base,route,data={},cookie='',headers={})=>fetch(base+'/api/'+route,{method:'POST',headers:{'Content-Type':'application/json',Cookie:cookie,...headers},body:JSON.stringify(data)});
+  try{
+    let base=await start();
+    assert.throws(()=>createServer({dataDir:dir}),/already in use/);
+    await assert.rejects(backup(dir,path.join(dir,'unused')),/already in use/);
+    const a=await post(base,'storage/load'),cookieA=a.headers.get('set-cookie').split(';')[0],recordA=await a.json();
+    assert.match(a.headers.get('set-cookie'),/HttpOnly; SameSite=Strict/);
+    const b=await post(base,'storage/load'),cookieB=b.headers.get('set-cookie').split(';')[0],recordB=await b.json();assert.notEqual(recordA.recordId,recordB.recordId);
+    await post(base,'score-objective',{answers:assessment.answers,code:assessment.coding.code},cookieA);
+    await post(base,'grade-scenarios',{answers:written},cookieA);
+    assert.equal((await post(base,'storage/save',{revision:0,state,recordId:recordB.recordId},cookieA)).status,409);
+    const saved=await post(base,'storage/save',{revision:0,state,recordId:recordA.recordId},cookieA);assert.equal(saved.status,200);
+    const loadA=await (await post(base,'storage/load',{},cookieA)).json();
+    assert.equal(loadA.scores.objective.knowledge.correct,50);assert.equal(loadA.scores.objective.coding.passed,8);assert.equal(loadA.scores.written.grades[0].points,3);assert.equal(loadA.recommendations[0].name,'Software development');assert.equal(loadA.recommendationVersion,'profile_ranking_v1');
+    assert.equal(JSON.parse(loadA.state['astra-research-pilot-v0-1']).coding.lastRun.version,'larger_checks_v2_ast_v1');
+    const loadB=await (await post(base,'storage/load',{recordId:recordA.recordId},cookieB)).json();assert.deepEqual(loadB.state,{});assert.equal(loadB.recordId,recordB.recordId);
+    assert.equal((await post(base,'storage/save',{revision:0,state,recordId:recordA.recordId},cookieA)).status,409);
+    assert.equal((await post(base,'storage/save',{revision:1,state},cookieA,{Origin:'https://foreign.example'})).status,403);
+    assert.equal((await post(base,'storage/save',{revision:1,state},cookieA,{'Sec-Fetch-Site':'cross-site'})).status,403);
+    assert.equal((await post(base,'storage/save',{revision:1,state},cookieA,{'Content-Type':'text/plain'})).status,415);
+    for(const url of ['/storage/assessment.js','/.astra-data/storage.key','/.astra-backups/backup/storage.key','/models/model.js','/datasets/data.js'])assert.equal((await fetch(base+url)).status,404);
+    const oldCode=(await (await post(base,'storage/recovery',{},cookieA)).json()).code;
+    const code=(await (await post(base,'storage/recovery',{},cookieA)).json()).code;
+    assert.equal((await post(base,'storage/resume',{code:oldCode},cookieB)).status,403);
+    assert.equal((await post(base,'storage/resume',{code:'0'.repeat(48)},cookieB)).status,403);
+    const recordFile=path.join(dir,hash(cookieA.split('=')[1]),'assessment.json');
+    const raw=await fs.readFile(recordFile,'utf8');assert.ok(!raw.includes('Private student'));assert.match(raw,/astra-aes-gcm-v1/);
+    const recoveryFiles=await fs.readdir(path.join(dir,'recovery'));assert.ok(!recoveryFiles.join().includes(code.replaceAll('-','')));
+    await new Promise(resolve=>server.close(resolve));base=await start();
+    const resumed=await post(base,'storage/resume',{code},cookieB),newCookie=resumed.headers.get('set-cookie').split(';')[0],resumedRecord=await resumed.json();
+    assert.equal(resumedRecord.recordId,recordA.recordId);assert.equal(resumedRecord.revision,1);assert.equal(JSON.parse(resumedRecord.state['astra-student-profile-v1']).evidence[0].earned,'85');assert.equal(resumedRecord.scores.written.metadata.modelVersion,'test-model');
+    assert.equal((await post(base,'storage/save',{revision:1,state,recordId:recordB.recordId},newCookie)).status,409,'An old tab cannot overwrite the assessment selected by another tab');
+    assert.equal((await (await post(base,'grade-scenarios',{answers:written},newCookie)).json()).cached,true);
+    assert.equal((await post(base,'grade-scenarios',{answers:written},newCookie,{'X-Astra-Assessment':recordB.recordId})).status,409);
+    const signedOut=await post(base,'storage/logout',{},newCookie);assert.equal(signedOut.status,200);
+    const revoked=await (await post(base,'storage/load',{},newCookie)).json();assert.notEqual(revoked.recordId,recordA.recordId,'Signing out revokes the old session token');
+    const newRecord=await (await post(base,'storage/new',{},newCookie)).json();assert.notEqual(newRecord.recordId,recordA.recordId);assert.deepEqual(newRecord.state,{});
+    await new Promise(resolve=>server.close(resolve));
+    const snapshot=await backup(dir,path.join(root,path.basename(dir)+'-backups'));assert.ok((await verify(snapshot)).files.length>3);
+    const restored=await restore(snapshot,path.join(dir,'restored'));assert.deepEqual(await privateStore(restored).read(path.join(restored,hash(cookieA.split('=')[1]),'assessment.json')),await privateStore(dir).read(recordFile));
+    await assert.rejects(restore(snapshot,restored),error=>error.code==='EEXIST');
+    base=await start(restored);assert.equal((await (await post(base,'storage/resume',{code})).json()).recordId,recordA.recordId);await new Promise(resolve=>server.close(resolve));
+    await fs.appendFile(path.join(snapshot,'storage.key'),'corrupt');await assert.rejects(verify(snapshot),/integrity check/);
+    // Backups are separate siblings of the isolated disposable test directory.
+    const backups=path.join(root,path.basename(dir)+'-backups');if(!backups.startsWith(root+path.sep+'storage-test-'))throw Error('Unsafe cleanup');await fs.rm(backups,{recursive:true,force:true});
+  }finally{if(server?.listening)await new Promise(resolve=>server.close(resolve));if(!dir.startsWith(root+path.sep+'storage-test-'))throw Error('Unsafe cleanup');await fs.rm(dir,{recursive:true,force:true});}
+});
