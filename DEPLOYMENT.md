@@ -24,12 +24,20 @@ The production server uses Supabase for encrypted assessment records. Render's l
    - `SUPABASE_SECRET_KEY`: server-only secret key, never the publishable key.
    - `GEMINI_API_KEY`: grading key.
    - `GEMINI_MODEL=gemini-3.5-flash-lite`: explicit model matching the project's free quota; avoid a moving alias.
+   - `GROQ_API_KEY`: optional server-only Groq key, enabling the automatic backup.
+   - `GROQ_MODEL=openai/gpt-oss-120b`: backup model with strict JSON schema support.
    - `NORTHSTAR_STORAGE_KEY`: a stable base64-encoded 32-byte encryption key (the Blueprint generates it). Save a private backup of this key; losing it makes existing encrypted records unreadable.
    - `NORTHSTAR_STORAGE=supabase`, `ASTRA_HTTPS=true`, `NODE_ENV=production`, `NODE_VERSION=24.19.0`.
 5. Build `npm ci`, start `npm start`, health path `/healthz`. Render supplies `PORT` and `RENDER_EXTERNAL_URL`. For a custom domain, set `NORTHSTAR_PUBLIC_URL` to its HTTPS origin.
 6. Verify a synthetic assessment saves, reloads after a deployment, resumes with its recovery code, and cannot edit submitted answers. Verify public/publishable Supabase access cannot read records. Verify grading and RF results before inviting students.
 
 ## Data and access
+
+### Grading fallback
+
+When a Groq key is configured, Gemini has a 15-second attempt and Groq has a 20-second backup attempt, fitting the existing 40-second browser grading timeout. Backup runs on timeout, connection failure, quota, provider unavailability/configuration rejection, or invalid grading evidence. Input validation errors never trigger backup. Both providers receive the same rubric and submitted responses, and both pass the same ID, points, criteria and answer-bound evidence checks. Groq additionally uses strict JSON schema output. Neither provider replaces deterministic coding-test points. Successful grades retain the actual provider/model and fallback metadata in the existing encrypted cache; no regrading occurs merely because the backup was enabled. If neither provider succeeds, incomplete scores remain pending.
+
+Groq's free token limits still apply to long answers and busy periods. Confirm grading agreement against independently reviewed responses before treating a provider switch as validated. Live backup verification requires the key to be configured in Render.
 
 Only encrypted AES-256-GCM envelopes and hashed record keys are stored. Student browsers communicate with NorthStar, not Supabase. Existing session ownership, revision checks, recovery codes, and submitted-answer locks are preserved. A database lease serializes mutations across overlapping server deployments; writes verify the lease inside the database transaction. Provider failures return an error without falling back to temporary files.
 
