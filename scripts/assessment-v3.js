@@ -23,6 +23,14 @@
   const fields={ 'OB-NW09':['ipv4_address','subnet_mask','default_gateway','dns_server'], 'OB-CS09':['student_own_draft','student_other_draft','student_own_submitted','researcher_any_submitted'], 'OB-DA09':['cleaned_rows','duplicates_removed','missing_rows_removed','mean_minutes'] };
   for(const i of B.items)if(i.fields)fields[i.id]=i.fields;
   if(B.version==='4.0')fields['OB-DA10']=fields['OB-DA09'];
+  function responseIssues(i){
+    if(!['OB-DA09','OB-DA10'].includes(i.id))return [];
+    const value=a.responses[i.id]||{},issues=[];
+    try{if(!Array.isArray(typeof value.cleaned_rows==='string'?JSON.parse(value.cleaned_rows):value.cleaned_rows))throw Error();}
+    catch{issues.push(['cleaned_rows','Enter cleaned rows as a JSON array, for example [{"id":"X","minutes":5}].']);}
+    for(const [field,label]of [['duplicates_removed','Duplicates removed'],['missing_rows_removed','Missing rows removed'],['mean_minutes','Mean minutes']])if(typeof value[field]!=='number'||!Number.isFinite(value[field]))issues.push([field,`${label}: enter a number, not text.`]);
+    return issues;
+  }
   const filled=i=>{const v=a.responses[i.id];return i.type==='Knowledge MCQ'?['A','B','C','D'].includes(v):fields[i.id]?v&&fields[i.id].every(k=>Object.hasOwn(v,k)&&v[k]!==''&&v[k]!==null):typeof v==='string'&&!!v.trim();};
   const skillsDone=()=>B.items.every(filled);
   const testMode=['practical','written'].includes(query.get('test'))?query.get('test'):null;
@@ -135,7 +143,7 @@
     panel.querySelector('#v3-form').addEventListener('input',changed);
     const check=panel.querySelector('#v3-check');if(check)check.onclick=async()=>{if(!filled(i))return error('Complete the task before checking it.');check.disabled=true;error('Checking this task…');try{const r=await request(i.type==='Written scenario'?'grade':'score'),g=r.grades[i.id];error(g.status==='graded'?`${g.points} / 4 points. Criteria: ${g.criteria.map((n,k)=>`C${k+1} ${n?'passed':'not passed'}`).join(', ')}.${g.feedback?' '+g.feedback:''}`:g.error||'This task remains unscored.');}catch(e){error(e.message);}finally{check.disabled=false;}};
     panel.querySelector('#v3-back').onclick=()=>{if(testMode){if(position){a.stage=B.items.indexOf(testItems[position-1]);save();skills();}else go('assessment.html?bank=v3');return;}if(a.stage){a.stage--;save();skills();}else go('review.html');};
-    panel.querySelector('#v3-next').onclick=()=>{if(!filled(i))return error('Complete this response before continuing.');if(testMode){if(position===5)testReview=true;else a.stage=B.items.indexOf(testItems[position+1]);}else a.stage++;save();skills();panel.querySelector('h2')?.focus();window.scrollTo({top:0,behavior:'instant'});};
+    panel.querySelector('#v3-next').onclick=()=>{const issues=responseIssues(i);panel.querySelectorAll('[aria-invalid]').forEach(field=>field.removeAttribute('aria-invalid'));if(issues.length){for(const [field]of issues)panel.querySelector(`[data-field="${field}"]`)?.setAttribute('aria-invalid','true');error(issues.map(([,message])=>message).join(' '));const first=panel.querySelector(`[data-field="${issues[0][0]}"]`);first?.focus();first?.scrollIntoView?.({block:'center',behavior:'smooth'});return;}if(!filled(i))return error('Complete this response before continuing.');if(testMode){if(position===5)testReview=true;else a.stage=B.items.indexOf(testItems[position+1]);}else a.stage++;save();skills();panel.querySelector('h2')?.focus();window.scrollTo({top:0,behavior:'instant'});};
     panel.querySelector('#v3-jump').onchange=e=>{if(e.target.value!==''){a.stage=Number(e.target.value);save();skills();}};
   }
   function finish(){
