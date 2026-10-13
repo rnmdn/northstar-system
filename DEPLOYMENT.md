@@ -7,7 +7,7 @@
 - Supabase project: `mncmpsuwclksayfiayqv`, NorthStar, rnmdn's Org, Free, Singapore.
 - Verified live: HTTPS and health check, private server paths blocked, encrypted cloud save/reload, recovery after replacement deployments, submitted-answer edits rejected. SQL checks confirmed RLS and denied table/function access for anon and authenticated roles. All 15 records at verification were encrypted envelopes.
 - Local assessment, RF, and cloud-adapter regression checks passed.
-- Remaining issue: Google Gemini generation returned high-demand HTTP 503 and timeouts during live verification. Gemini is configured with the existing key and `gemini-3.5-flash-lite`. Written grading and the full live RF result flow have not passed while Google is unavailable; saved responses remain pending. Do not describe AI grading as successfully verified.
+- Gemini initially returned high-demand HTTP 503 and timeouts. After adding the Groq backup, the saved fictional assessment successfully graded using Groq `openai/gpt-oss-120b` with `fallbackUsed=true`, and the trained RF returned three suggestions. Recovery after replacement deployments and submitted-answer locks passed again. The repeat check reused cached grades. This verifies the live integration; independent grading calibration remains pending.
 - Secrets were entered only in Render configuration; no credentials or student records were committed. The temporary transfer file was removed.
 
 The existing Render service is connected to the private `rnmdn/north-star-app` repository. A public source snapshot can coexist with that deployment repository.

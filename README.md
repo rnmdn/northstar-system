@@ -56,4 +56,4 @@ The mapping and learning-start thresholds are preliminary. Job-posting classific
 
 ## Hosting status
 
-NorthStar is deployed at https://northstar-x96p.onrender.com using Render Free and encrypted Supabase storage. Live saving, recovery after redeployment, and submitted-answer locks are verified. Google Gemini is currently returning high-demand errors/timeouts; written grading and the full live recommendation flow remain unverified until it responds successfully. Local development retains encrypted file storage. See DEPLOYMENT.md for configuration and verification details. GitHub Pages alone cannot run the server.
+NorthStar is deployed at https://northstar-x96p.onrender.com using Render Free and encrypted Supabase storage. Live saving, recovery after redeployment, and submitted-answer locks are verified. Gemini is the primary grader, with Groq as backup. Live backup grading and RF recommendations passed using a fictional assessment; independent grading calibration is still pending. Local development retains encrypted file storage. See DEPLOYMENT.md for configuration and verification details. GitHub Pages alone cannot run the server.
