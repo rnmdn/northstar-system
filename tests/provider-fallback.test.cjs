@@ -22,3 +22,11 @@ test('invented backup evidence and dual failures stay pending; invalid inputs ne
  await assert.rejects(v.gradeWritten(input,options),e=>e.code==='ALL_PROVIDERS_UNAVAILABLE'&&!e.message.includes('gemini-test'));assert.equal(calls,2);
  calls=0;await assert.rejects(v.gradeWritten({bankVersion:'4.0',responses:{unknown:'answer'}},options));assert.equal(calls,0);
 });
+test('Groq rate limits preserve retry-after and stop repeated upstream attempts',async()=>{
+ let backupCalls=0;const options={key:'gemini-test',groqKey:'groq-rate-test',fetchImpl:async url=>{
+  if(url.includes('googleapis'))return {ok:false,status:503,json:async()=>({})};
+  backupCalls++;return {ok:false,status:429,headers:new Headers({'retry-after':'120'}),json:async()=>({error:{message:'TPM exceeded; private upstream detail'}})};
+ }};
+ for(let attempt=0;attempt<2;attempt++)await assert.rejects(v.gradeWritten(input,options),e=>e.status===429&&e.code==='GRADING_RATE_LIMIT'&&e.retryAfter>=119&&!e.message.includes('private upstream detail'));
+ assert.equal(backupCalls,1);
+});

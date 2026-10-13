@@ -142,10 +142,10 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
           if(!await readRecord(file)){
             const pendingKey='v3:'+owner,active=pending.get(pendingKey);
             if(active&&active.fingerprint!==fingerprint)return send(res,429,{error:'Another grading request is running. Retry shortly.'});
-            if(!active&&(cooldowns.get(pendingKey)||0)>Date.now())return send(res,429,{error:'Retry grading in a few seconds. Your answers are saved.'});
+            if(!active&&(cooldowns.get(pendingKey)||0)>Date.now()){const seconds=Math.ceil((cooldowns.get(pendingKey)-Date.now())/1000);return send(res,429,{error:`Grading is cooling down. Wait ${seconds} seconds before retrying. Your answers are saved.`,retryAfter:seconds},{'Retry-After':String(seconds)});}
             let promise=active?.promise;
             if(!promise){cooldowns.set(pendingKey,Date.now()+10000);promise=(async()=>{const result=await (gradeV3||v3.gradeWritten)(a,{model});result.grades=v3.validateWritten(result.grades,Object.keys(v3Storage.writtenAnswers(a)));await store(file,result);})();pending.set(pendingKey,{fingerprint,promise});promise.then(()=>pending.delete(pendingKey),()=>pending.delete(pendingKey));}
-            await promise;
+            try{await promise;}catch(error){if(error.retryAfter)cooldowns.set(pendingKey,Date.now()+error.retryAfter*1000);throw error;}
           }
           return send(res,200,await completeScores());
         }
@@ -180,7 +180,7 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
       let stat;try{stat=await fsp.stat(file);}catch{return send(res,404,{error:'Not found.'});}if(!stat.isFile())return send(res,404,{error:'Not found.'});
       if(await fsp.realpath(file)!==file)return send(res,404,{error:'Not found.'});
       res.writeHead(200,{'Content-Type':types[path.extname(file)]+'; charset=utf-8','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY'});if(req.method==='HEAD')return res.end();fs.createReadStream(file).pipe(res);
-    }catch(error){if(!res.headersSent)send(res,error.status||500,{error:error.status?error.message:'The server could not save or process this assessment. Retry later.'});else res.end();}
+    }catch(error){if(!res.headersSent)send(res,error.status||500,{error:error.status?error.message:'The server could not save or process this assessment. Retry later.',...(error.retryAfter?{retryAfter:error.retryAfter,code:error.code}: {})},error.retryAfter?{'Retry-After':String(error.retryAfter)}:{});else res.end();}
   });
   server.on('close',unlock);
   server.on('error',()=>{if(!server.listening)unlock();});

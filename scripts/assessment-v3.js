@@ -62,7 +62,7 @@
   function shell(title,body){panel.innerHTML=`<h2 tabindex="-1" id="v3-heading">${title}</h2>${body}${page==='assessment'?'':notice}`;}
   function error(message){const n=panel.querySelector('#v3-status');if(n)n.textContent=message;}
   function invalidate(id){delete a.recommendation;a.selected=[];if(a.scores){delete a.scores.grades[id];a.scores.careers=null;}save();}
-  async function request(route){await window.AstraStorage.flush();const stamp=JSON.stringify(a.responses);const r=await fetch('/api/v3/'+route,{method:'POST',headers:{'Content-Type':'application/json','X-Astra-Assessment':window.AstraStorage.recordId},body:JSON.stringify({bankVersion:B.version,responses:JSON.parse(stamp)}),signal:AbortSignal.timeout(40000)});const result=await r.json();if(!r.ok)throw Error(result.error||'Scoring is unavailable. Your responses are saved.');if(stamp!==JSON.stringify(a.responses))throw Error('Your responses changed during grading. Run the check again.');a.scores=result;if(result.submittedAt)a.submittedAt=result.submittedAt;window.AstraStorage.acceptRevision?.(result.recordRevision);if(result.features)a.features=result.features;save();return result;}
+  async function request(route){await window.AstraStorage.flush();const stamp=JSON.stringify(a.responses);const r=await fetch('/api/v3/'+route,{method:'POST',headers:{'Content-Type':'application/json','X-Astra-Assessment':window.AstraStorage.recordId},body:JSON.stringify({bankVersion:B.version,responses:JSON.parse(stamp)}),signal:AbortSignal.timeout(40000)});const result=await r.json();if(!r.ok)throw Object.assign(Error(result.error||'Scoring is unavailable. Your responses are saved.'),{retryAfter:result.retryAfter||0});if(stamp!==JSON.stringify(a.responses))throw Error('Your responses changed during grading. Run the check again.');a.scores=result;if(result.submittedAt)a.submittedAt=result.submittedAt;window.AstraStorage.acceptRevision?.(result.recordRevision);if(result.features)a.features=result.features;save();return result;}
   const status='<p id="v3-status" role="status" aria-live="polite"></p>';
   let profileStep=Math.max(0,Math.min(2,Number(query.get('step'))||0));
   function profile(){
@@ -159,7 +159,7 @@
         error('Saving and checking your knowledge and practical work…');await request('submit');
         error('Grading written answers and reviewing coding responses together. Please wait…');await request('grade');
         go('skills-results.html');
-      }catch(e){error(e.message+' Grading remains pending where incomplete. Retry submission to finish.');submit.disabled=false;if(back)back.disabled=false;submit.textContent='Retry submission →';}
+      }catch(e){error(e.message+(e.retryAfter?'':' Grading remains pending where incomplete. Retry submission to finish.'));if(back)back.disabled=false;if(e.retryAfter){submit.textContent='Retry available after '+e.retryAfter+' seconds';setTimeout(()=>{submit.disabled=false;submit.textContent='Retry grading →';},e.retryAfter*1000);}else{submit.disabled=false;submit.textContent='Retry grading →';}}
     };
   }
   function bar(part){if(!part||part.points===null)return '<span class="v3-pending">Pending / incomplete</span>';return `<div class="v3-score"><span>${part.points} / ${part.maximum}</span><progress value="${part.points}" max="${part.maximum}" aria-label="${part.points} of ${part.maximum} points"></progress></div>`;}

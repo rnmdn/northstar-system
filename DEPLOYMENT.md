@@ -39,6 +39,8 @@ When a Groq key is configured, Gemini has a 15-second attempt and Groq has a 20-
 
 Groq's free token limits still apply to long answers and busy periods. Confirm grading agreement against independently reviewed responses before treating a provider switch as validated. Live backup verification requires the key to be configured in Render.
 
+Repeated-failure investigation on October 13 found Gemini HTTP 503/timeouts followed by Groq HTTP 429. The fallback now preserves Retry-After, shares a Groq cooldown across sessions on the running server, and returns a specific rate-limit message. The HTTP route enforces the retry delay and the submission button remains disabled during that delay. Only fixed rate-limit categories are logged; raw provider responses, secrets and answers are excluded. Free daily limits may require waiting beyond a short retry delay; adding a backup does not remove either provider's quota.
+
 Only encrypted AES-256-GCM envelopes and hashed record keys are stored. Student browsers communicate with NorthStar, not Supabase. Existing session ownership, revision checks, recovery codes, and submitted-answer locks are preserved. A database lease serializes mutations across overlapping server deployments; writes verify the lease inside the database transaction. Provider failures return an error without falling back to temporary files.
 
 Existing local student records are retained in the original working folder and are not uploaded automatically. Keep the old local server available until the new deployment is verified. Rolling back the Git commit does not delete Supabase records; older code without the adapter must not be deployed to production.
