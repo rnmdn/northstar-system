@@ -20,6 +20,7 @@
     panel.append(message);tools.remove();
     retry.hidden=true;download.hidden=true;reload.hidden=true;message.hidden=true;
     panel.classList.add('storage-compact');
+    const recoveryLink=document.createElement('a');recoveryLink.href='resume.html';recoveryLink.textContent='Recovery options';panel.querySelector('.storage-summary').append(recoveryLink);
   }
   function note(message) { const field=$('storage-message');field.textContent=message;field.hidden=!message; }
   function failure(error) {
@@ -43,7 +44,7 @@
   }
   async function post(route, data = {}) {
     const response = await fetch('/api/storage/'+route,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(15000)});
-    let value; try { value = await response.json(); } catch { throw new Error('Storage is unavailable. Start Astra with node server.js.'); }
+    let value; try { value = await response.json(); } catch { throw new Error('We couldn’t connect to your saved assessment. Keep this tab open and retry.'); }
     if(!response.ok) throw Object.assign(new Error(value.error || 'Your assessment could not be saved.'),{status:response.status});
     return value;
   }
@@ -74,15 +75,15 @@
   }
   async function fresh() { await flush(); const record = await post('new'); hydrate(record); location.href = 'assessment.html'; }
   function resumeTarget(state) {
-    if(state['astra-item-bank-v4']){const a=JSON.parse(state['astra-item-bank-v4']);sessionStorage.setItem('astra-bank-mode','v4');return a.selected?.length?'next-steps.html':a.stage===48?'skills-results.html':a.reviewed?'skills-assessment.html':'assessment.html';}
-    if(state['astra-item-bank-v3']){const a=JSON.parse(state['astra-item-bank-v3']);sessionStorage.setItem('astra-bank-mode','v3');return a.selected?.length?'next-steps.html':a.stage===48?'skills-results.html':a.reviewed?'skills-assessment.html':'assessment.html';}
+    if(state['astra-item-bank-v4']){const a=JSON.parse(state['astra-item-bank-v4']);sessionStorage.setItem('astra-bank-mode','v4');return a.selected?.length?'next-steps.html':a.stage===48?(a.submittedAt?'skills-results.html':'skills-assessment.html?review=1'):a.reviewed?'skills-assessment.html':'assessment.html';}
+    if(state['astra-item-bank-v3']){const a=JSON.parse(state['astra-item-bank-v3']);sessionStorage.setItem('astra-bank-mode','v3');return a.selected?.length?'next-steps.html':a.stage===48?(a.submittedAt?'skills-results.html':'skills-assessment.html?review=1'):a.reviewed?'skills-assessment.html':'assessment.html';}
     if(state['astra-student-profile-v1'])sessionStorage.setItem('astra-bank-mode','legacy');
     if(state['astra-results-complete']==='true')return 'next-steps.html';
     if(state['astra-skills-complete']==='true')return 'skills-results.html';
     if(state['astra-review-complete']==='true')return 'skills-assessment.html';
     return 'assessment.html?step='+(state['astra-assessment-unlocked-v1']||'0');
   }
-  window.AstraStorage = {cache,flush,navigate,fresh,acceptRevision(value){if(Number.isInteger(value)&&value>=revision)revision=value;},get recordId(){return sessionStorage.getItem('astra-record-id');}};
+  window.AstraStorage = {cache,flush,navigate,fresh,async createRecovery(){await flush();return (await post('recovery')).code;},acceptRevision(value){if(Number.isInteger(value)&&value>=revision)revision=value;},get recordId(){return sessionStorage.getItem('astra-record-id');}};
   if(recoveryPage) {
   $('storage-tools').hidden=false;
   $('storage-open').hidden=true;

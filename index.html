@@ -228,7 +228,8 @@
   @media (max-width:540px) { .how-preview { padding:8px; } .preview-sheet { transform:rotate(-.4deg); } .preview-sheet-head,.preview-sheet-foot { padding-inline:18px; } .preview-sheet-body { padding:26px 22px; } .preview-sheet-body h3 { font-size:clamp(35px,10vw,47px); } .preview-result { grid-template-columns:20px minmax(0,1fr) 54px; gap:7px; font-size:11px; } }
   @media (max-width:768px) { .intro .step { grid-template-columns:48px minmax(0,1fr); gap:16px; padding-bottom:40px; } .intro .step-number { width:48px; height:48px; font-size:19px; } .intro .steps::before,.intro .steps::after { left:23px; top:36px; bottom:60px; } }
   @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .hero-journey { height:auto; } .hero { position:relative; } .hero-video,.hero-content,.scene-hill,.preview-sheet { transform:none!important; } .hero-content,.hero-bottom { opacity:1!important; } .star-rings,.star-glow,.journey-wash { display:none; } .how-motion .intro .step,.how-motion .preview-result { opacity:1; transform:none; transition:none; } .path-item[open] .path-detail { animation:none; } .intro .steps::after { transform:scaleY(1); transition:none; } .assessment-transition { display:none; } }
-  </style>
+  .hero-assessment-actions{display:flex;align-items:center;flex-wrap:wrap;gap:24px}.hero-resume{color:#e0eeff;text-underline-offset:5px;padding:12px 0;font-size:16px}.hero-note{max-width:66ch}
+</style>
 <link rel="stylesheet" href="styles/astra-loading.css"><link rel="stylesheet" href="styles/northstar-integration.css?v=1"><script>document.documentElement.classList.add("astra-loading");</script><script src="scripts/astra-loading.js" defer></script></head>
 <body><div class="astra-loader" aria-label="Opening NorthStar"><div class="loader-identity"><img src="assets/astra-loading-star.png" alt="" width="240" height="160"><p class="loader-wordmark">NORTHSTAR</p><p class="loader-caption" role="status">Getting ready<span class="loader-dots" aria-hidden="true">...</span></p></div></div>
   <a class="skip" href="#main">Skip to content</a>
@@ -249,8 +250,8 @@
         <p class="eyebrow">Your future in IT starts with a direction</p>
         <h1>Find your <em>way forward.</em></h1>
         <p class="hero-lead">Explore IT paths through your skills, experience, interests and work preferences.</p>
-        <div><a class="button" href="assessment.html">Start the assessment <span aria-hidden="true">→</span></a></div>
-        <p class="hero-note">Build your profile, then try knowledge questions and practical tasks.</p>
+        <div class="hero-assessment-actions"><a class="button" href="assessment.html">Start the assessment <span aria-hidden="true">→</span></a><a class="hero-resume" href="resume.html">Resume assessment</a></div>
+        <p class="hero-note">48 questions across six IT areas, including practical tasks and written responses. Progress saves when the save status confirms it. Keep a recovery code to return on another device.</p>
       </div>
       <div class="hero-bottom wrap"><span>Explore what is possible</span><a href="#how">Scroll to discover ↓</a></div>
       <div class="journey-wash" aria-hidden="true"></div>

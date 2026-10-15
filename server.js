@@ -129,7 +129,7 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
           if(url.pathname==='/api/v3/submit'){
             const submission=await privateData.exclusive(async()=>{
               const current=await readRecord(recordPath(owner)),saved=current?.state[v3Storage.key]?v3Storage.validate(JSON.parse(current.state[v3Storage.key])):null;
-              if(!saved||!v3Storage.profileComplete(saved)||!saved.reviewed||!v3.responsesComplete(saved)||!require('node:util').isDeepStrictEqual(saved.responses,responses))throw Object.assign(Error('Save and complete your assessment before submitting.'),{status:422});
+              if(!saved||!v3Storage.profileComplete(saved)||!saved.reviewed||saved.skipped?.length||!v3.responsesComplete(saved)||!require('node:util').isDeepStrictEqual(saved.responses,responses))throw Object.assign(Error('Save and complete your assessment before submitting.'),{status:422});
               if(!saved.submittedAt){saved.submittedAt=new Date().toISOString();current.state[v3Storage.key]=JSON.stringify(saved);current.revision++;await store(recordPath(owner),current);}
               return current;
             });record=submission;

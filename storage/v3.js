@@ -11,14 +11,16 @@ function validate(a){
  const exposure=p.exposure??null;
  if(exposure!==null&&(!Array.isArray(exposure)||new Set(exposure).size!==exposure.length||exposure.some(id=>!v3.bank.exposure.some(i=>i.id===id))||exposure.includes('EX-NONE')&&exposure.length!==1))fail('Invalid v3 exposure selections.');
  const selected=a.selected||[];if(!Array.isArray(selected)||selected.length>3||new Set(selected).size!==selected.length||selected.some(c=>!v3.bank.items.some(i=>i.career===c)))fail('Choose up to three career paths.');
+ const itemList=name=>{const list=a[name]||[];if(!Array.isArray(list)||list.length>48||new Set(list).size!==list.length||list.some(id=>!v3.bank.items.some(i=>i.id===id)))fail('Invalid question review status.');return list;};
+ const skipped=itemList('skipped'),flagged=itemList('flagged');
  const reflections={};for(const [c,s]of Object.entries(a.reflections||{})){if(!v3.bank.items.some(i=>i.career===c)||typeof s!=='string'||s.length>2000)fail('Invalid reflection.');reflections[c]=s;}
  if(!Number.isInteger(a.stage)||a.stage<0||a.stage>48)fail('Invalid v3 stage.');
  for(const f of ['feedback','unclear'])if(a[f]!==undefined&&(typeof a[f]!=='string'||a[f].length>4000))fail('Invalid feedback.');
- return {bankVersion:v3.version,submittedAt:typeof a.submittedAt==='string'?a.submittedAt:null,profile:{interests:interest,styles:style,exposure},responses:v3.validate(a),stage:a.stage,reviewed:a.reviewed===true,selected,reflections,feedback:a.feedback||'',unclear:a.unclear||''};
+ return {bankVersion:v3.version,submittedAt:typeof a.submittedAt==='string'?a.submittedAt:null,profile:{interests:interest,styles:style,exposure},responses:v3.validate(a),stage:a.stage,reviewed:a.reviewed===true,selected,reflections,skipped,flagged,recoveryPromptSeen:a.recoveryPromptSeen===true,feedback:a.feedback||'',unclear:a.unclear||''};
 }
 function profileComplete(a){return a.profile.exposure?.length>0&&Object.keys(a.profile.interests).length===18&&Object.keys(a.profile.styles).length===5;}
-function writtenAnswers(a){return Object.fromEntries(v3.bank.items.filter(i=>['Written scenario','Coding task','SQL task','HTML task'].includes(i.type)&&v3.nonempty(a.responses[i.id])).map(i=>[i.id,a.responses[i.id]]));}
-const objectiveHash=a=>hash({bank:v3.version,source:v3.bank.sourceSha256,policy:'v3-grading-4',rubric:v3.bank.rubricVersion,responses:Object.fromEntries(v3.bank.items.filter(i=>i.type!=='Written scenario'&&Object.hasOwn(a.responses,i.id)).map(i=>[i.id,a.responses[i.id]]))});
+function writtenAnswers(a){return Object.fromEntries(v3.bank.items.filter(i=>['Written scenario','Coding task','SQL task','HTML task'].includes(i.type)&&v3.nonempty(a.responses[i.id])&&!v3.isNotLearned(a.responses[i.id])).map(i=>[i.id,a.responses[i.id]]));}
+const objectiveHash=a=>hash({bank:v3.version,source:v3.bank.sourceSha256,policy:'v3-grading-4',rubric:v3.bank.rubricVersion,responses:Object.fromEntries(v3.bank.items.filter(i=>(i.type!=='Written scenario'||v3.isNotLearned(a.responses[i.id]))&&Object.hasOwn(a.responses,i.id)).map(i=>[i.id,a.responses[i.id]]))});
 const writtenHash=(a,model)=>hash({feedbackVersion:'student-v1',bank:v3.version,source:v3.bank.sourceSha256,policy:'v3-grading-4',rubric:v3.bank.rubricVersion,model,responses:writtenAnswers(a)});
 async function scores(a,owner,store,dataDir,model){
  const objective=await store.read(path.join(dataDir,owner,prefix+'-objective-'+objectiveHash(a)+'.json'));
@@ -42,7 +44,7 @@ function features(a,scores){
  return {version:v3.version==='4.0'?'v4-assessment-fields':'v3-proposed-features',values,mappingStatus:v3.version==='4.0'?'Six-domain schema confirmed; objective-domain-pilot-v1 transformation requires adviser/student validation':'Proposed only; no verified Random Forest mapping or recommendation weights'};
 }
 async function recommendation(a,scoreSet,owner,store,dataDir,model,create=false){
- if(!profileComplete(a)||!a.reviewed||!v3.responsesComplete(a))return {status:'incomplete',reason:'Complete and review your assessment first.'};
+ if(!profileComplete(a)||!a.reviewed||a.skipped?.length||!v3.responsesComplete(a))return {status:'incomplete',reason:'Complete and review your assessment first.'};
  const {mapStudent}=require('../ml/student-mapping.cjs'),rf=require('../ml/team-rf.cjs');
  const mapping=mapStudent(a,scoreSet);
  if(mapping.status!=='ready')return mapping;

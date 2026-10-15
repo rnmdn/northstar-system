@@ -126,18 +126,12 @@ test('Every revised page/task renders using v4; existing v3 answers are never si
  assert.equal(cache.get(s.key),undefined);assert.equal(cache.get('astra-bank-mode'),'v3');
 });
 
-test('Final submission batches six written answers and preserves retry after AI failure',async()=>{
+test('Final submission sends all answers then opens the results grading stage',async()=>{
  const bank=await fs.readFile(path.join(__dirname,'../scripts/bank-v4.js'),'utf8'),code=await fs.readFile(path.join(__dirname,'../scripts/assessment-v3.js'),'utf8');
- for(const fails of [false,true]){
-  const {window}=parseHTML(await fs.readFile(path.join(__dirname,'../skills-assessment.html'),'utf8')),a=draft();a.stage=48;a.responses=allResponses();
-  const cache=new Map([[s.key,JSON.stringify(a)]]),ss={getItem:k=>cache.get(k)||null,setItem:(k,text)=>cache.set(k,text)},calls=[];let destination;
-  const context={window,document:window.document,sessionStorage:ss,location:{search:'?bank=v4',pathname:'/skills-assessment.html'},URLSearchParams,setTimeout,console,AbortSignal,fetch:async(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return {ok:!fails||!url.endsWith('/grade'),json:async()=>fails&&url.endsWith('/grade')?{error:'AI quota reached'}:{grades:{},careers:[]}};}};
-  window.AstraStorage={cache:ss,recordId:'test-record',navigate:url=>{destination=url;},flush:async()=>{}};window.scrollTo=()=>{};
-  vm.runInNewContext(bank,context);vm.runInNewContext(code,context);
-  await window.document.querySelector('#v3-finish').onclick();
-  assert.deepEqual(calls.map(c=>c.url),['/api/v3/submit','/api/v3/grade']);
-  assert.equal(v.bank.items.filter(i=>i.type==='Written scenario'&&calls[1].body.responses[i.id]).length,6);
-  if(fails){assert.equal(destination,undefined);assert.equal(window.document.querySelector('#v3-finish').disabled,false);assert.match(window.document.querySelector('#v3-status').textContent,/pending/);}
-  else assert.match(destination,/skills-results.html/);
- }
+ const {window}=parseHTML(await fs.readFile(path.join(__dirname,'../skills-assessment.html'),'utf8')),a=draft();a.stage=48;a.responses=allResponses();
+ const cache=new Map([[s.key,JSON.stringify(a)]]),ss={getItem:k=>cache.get(k)||null,setItem:(k,text)=>cache.set(k,text)},calls=[];let destination;
+ const context={window,document:window.document,sessionStorage:ss,location:{search:'?bank=v4',pathname:'/skills-assessment.html'},URLSearchParams,setTimeout,console,AbortSignal,fetch:async(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return {ok:true,json:async()=>({grades:{},careers:[],submittedAt:'2026-10-15T00:00:00Z'})};}};
+ window.AstraStorage={cache:ss,recordId:'test-record',navigate:url=>{destination=url;},flush:async()=>{}};window.scrollTo=()=>{};
+ vm.runInNewContext(bank,context);vm.runInNewContext(code,context);await window.document.querySelector('#v3-finish').onclick();
+ assert.deepEqual(calls.map(c=>c.url),['/api/v3/submit']);assert.equal(v.bank.items.filter(i=>i.type==='Written scenario'&&calls[0].body.responses[i.id]).length,6);assert.equal(destination,'skills-results.html?grading=auto');
 });
