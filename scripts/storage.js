@@ -1,6 +1,8 @@
 (() => {
   const loader = document.currentScript;
   const modules = (loader.dataset.modules || '').split(',').filter(Boolean);
+  // Fetch together while preserving the existing execution order below.
+  for (const src of modules) { const link=document.createElement('link');link.rel='preload';link.as='script';link.href=src;document.head.append(link); }
   const recoveryPage = document.body.dataset.page === 'resume';
   const keys = ['astra-item-bank-v4','astra-item-bank-v3','astra-student-profile-v1','astra-research-pilot-v0-1','astra-exploration-plan-v1','astra-assessment-unlocked-v1','astra-skills-stage-v3','astra-skills-return-v1','astra-review-complete','astra-skills-complete','astra-results-complete'];
   let revision = 0, dirty = false, saving = null, timer, conflict = false, ready = false, loadedModules = 0, navigating = false;
@@ -128,5 +130,5 @@
   async function loadModules() {
     for(;loadedModules<modules.length;loadedModules++) { const src=modules[loadedModules];if(window.AstraV3?.active && /scripts\/(student|skills-assessment|skills-results|skills-navigation|journey|certificate)\.js/.test(src))continue;await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=()=>reject(new Error('An assessment script could not load. Reload this page.'));document.body.append(script);}); }
   }
-  boot().catch(error => { ready=false;status('Server storage is unavailable');failure(error); });
+  boot().catch(error => { ready=false;status('Server storage is unavailable');failure(error); }).finally(() => document.documentElement.classList.remove('assessment-loading'));
 })();
