@@ -1,4 +1,13 @@
-# Render Free + Supabase Free
+# Vercel Hobby + Supabase Free
+
+## Deployment record — October 15, 2026
+
+- Public site: https://northstar-system-one.vercel.app
+- Vercel project: `yaaaa2/northstar-system`, Hobby, Singapore function region.
+- Reuses the existing Supabase project and storage encryption key. Production secrets are configured privately in Vercel.
+- Verified live with fictional assessments: recovery of a record created on Render, submitted-answer edits rejected, cached grading and three RF suggestions, and the isolated SQL checker awarding 4/4 for the reference query.
+- Fresh upstream AI availability was not established by the cached-grade check. Provider quota and timeout behavior remains unchanged.
+- Render remains available at https://northstar-x96p.onrender.com.
 
 ## Vercel migration
 
