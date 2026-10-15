@@ -80,17 +80,17 @@ test('Results use the RF ranking, save chosen directions, and show actionable pe
   if(ok){
    const rows=[...window.document.querySelectorAll('.rf-result h3')];assert.equal(rows.length,3);
    payload.topThree.forEach((item,n)=>assert(rows[n].textContent.includes(item.career)));
-   assert.deepEqual(JSON.parse(cache.get(s.key)).selected,payload.topThree.map(i=>i.career));
+   assert.deepEqual(JSON.parse(cache.get(s.key)).selected,[]);
    assert.equal(window.document.querySelectorAll('.career-card').length,3);
-   assert.equal(window.document.querySelectorAll('.top-model-match').length,1);
+   assert.equal(window.document.querySelectorAll('.career-match').length,0);assert(!window.document.querySelector('.career-cards').textContent.includes('%'));
    assert.match(window.document.querySelector('.career-preliminary').textContent,/professor review/);
    assert.equal(window.document.querySelectorAll('.model-match-help').length,0);
-   const choice=window.document.querySelector('#v3-paths input');choice.checked=false;
+   const choice=window.document.querySelector('#v3-paths input');choice.checked=true;
    window.document.querySelector('#v3-paths').onchange({target:choice});
-   assert.equal(JSON.parse(cache.get(s.key)).selected.length,2);
-   assert(!window.document.querySelector('#plan-directions').textContent.includes(choice.value));
+   assert.equal(JSON.parse(cache.get(s.key)).selected.length,1);
+   assert(window.document.querySelector('#plan-directions').textContent.includes(choice.value));
    choice.checked=true;window.document.querySelector('#v3-paths').onchange({target:choice});
-   assert.equal(JSON.parse(cache.get(s.key)).selected.length,3);
+   assert.equal(JSON.parse(cache.get(s.key)).selected.length,1);
    window.document.querySelector('#v3-plan').onclick();assert.equal(destination,'next-steps.html');
   }else{
    assert(window.document.querySelector('[role=alert]').textContent.includes(result.error));assert.equal(window.document.querySelectorAll('.rf-result').length,0);

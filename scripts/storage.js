@@ -129,7 +129,12 @@
     await loadModules();
   }
   async function loadModules() {
-    for(;loadedModules<modules.length;loadedModules++) { const src=modules[loadedModules];if(window.AstraV3?.active && /scripts\/(student|skills-assessment|skills-results|skills-navigation|journey|certificate)\.js/.test(src))continue;await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=()=>reject(new Error('An assessment script could not load. Reload this page.'));document.body.append(script);}); }
+    for(;loadedModules<modules.length;loadedModules++) { const src=modules[loadedModules];if(window.AstraV3?.active && /scripts\/(student|skills-assessment|skills-results|skills-navigation|journey|certificate)\.js/.test(src))continue;await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;const timer=setTimeout(()=>reject(new Error('Loading timed out.')),15000);const failed=()=>{clearTimeout(timer);reject(new Error('An assessment script could not load.'));};const runtimeError=e=>{if(e.filename&&new URL(e.filename,location.href).pathname===new URL(src,location.href).pathname)failed();};window.addEventListener?.('error',runtimeError);script.onload=()=>{clearTimeout(timer);window.removeEventListener?.('error',runtimeError);resolve();};script.onerror=()=>{window.removeEventListener?.('error',runtimeError);failed();};document.body.append(script);}); }
   }
-  boot().catch(error => { ready=false;status('Server storage is unavailable');failure(error); }).finally(() => document.documentElement.classList.remove('assessment-loading'));
+  const loading=document.getElementById?.('assessment-loading'),main=document.querySelector('main');
+  boot().then(()=>{document.documentElement.classList.remove('assessment-loading');main?.setAttribute?.('aria-busy','false');if(loading)loading.hidden=true;}).catch(()=>{
+    if(!loading){status('Couldn’t load your assessment. Reload this page to retry.');return;}
+    loading.querySelector('p').textContent='Couldn’t load your assessment. Your saved answers have not been changed.';
+    const retry=loading.querySelector('button');retry.hidden=false;retry.onclick=()=>location.reload();
+  });
 })();

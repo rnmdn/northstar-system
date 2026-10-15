@@ -25,3 +25,13 @@ This is a response-policy change, not a retrained model or a changed question ru
 The homepage offers Resume assessment. Profile review prompts once to keep a recovery code before the skills assessment; students may explicitly defer it. The code can also be created from persistent Recovery options. Anyone with a recovery code can open the record. Creating another code replaces the previous one. Save confirmation means a server write succeeded, not that cross-device retrieval is possible without a recovery code.
 
 No completion-time estimate is advertised until real student sessions are measured.
+
+## Career suggestions, loading and learning progress
+
+Career cards prioritize the career, assessment evidence and first activity. Numeric RF support is retained only inside the evidence/model breakdown, with its interpretation explained. Initial plan selection requires one deliberate direction; existing selected directions are retained and more may be added afterward.
+
+Activity completion is self-reported, stored per career in `activityProgress` with an ISO `completedAt` date, and can be unchecked. It does not change assessment scores, model inputs, or the recommendation ranking. Completion guidance suggests reflection or exploring another direction.
+
+Assessment loading uses a real live status and marks main content busy. Required module failures, runtime failures and loading timeouts keep the unfinished content hidden and offer Retry loading. The arbitrary 20-second reveal was removed. A storage outage can still reveal a usable local draft after application scripts initialize, with server-save status shown separately.
+
+Question Back, Next and jump transitions focus the current heading. Structured field errors have individual descriptions and reduced-motion-aware scrolling.

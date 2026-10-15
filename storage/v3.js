@@ -13,10 +13,11 @@ function validate(a){
  const selected=a.selected||[];if(!Array.isArray(selected)||selected.length>3||new Set(selected).size!==selected.length||selected.some(c=>!v3.bank.items.some(i=>i.career===c)))fail('Choose up to three career paths.');
  const itemList=name=>{const list=a[name]||[];if(!Array.isArray(list)||list.length>48||new Set(list).size!==list.length||list.some(id=>!v3.bank.items.some(i=>i.id===id)))fail('Invalid question review status.');return list;};
  const skipped=itemList('skipped'),flagged=itemList('flagged');
+ const activityProgress={};for(const [career,value]of Object.entries(a.activityProgress||{})){if(!v3.bank.items.some(i=>i.career===career)||!value||typeof value.completedAt!=='string'||value.completedAt.length>40||!Number.isFinite(Date.parse(value.completedAt)))fail('Invalid activity completion.');activityProgress[career]={completedAt:new Date(value.completedAt).toISOString()};}
  const reflections={};for(const [c,s]of Object.entries(a.reflections||{})){if(!v3.bank.items.some(i=>i.career===c)||typeof s!=='string'||s.length>2000)fail('Invalid reflection.');reflections[c]=s;}
  if(!Number.isInteger(a.stage)||a.stage<0||a.stage>48)fail('Invalid v3 stage.');
  for(const f of ['feedback','unclear'])if(a[f]!==undefined&&(typeof a[f]!=='string'||a[f].length>4000))fail('Invalid feedback.');
- return {bankVersion:v3.version,submittedAt:typeof a.submittedAt==='string'?a.submittedAt:null,profile:{interests:interest,styles:style,exposure},responses:v3.validate(a),stage:a.stage,reviewed:a.reviewed===true,selected,reflections,skipped,flagged,recoveryPromptSeen:a.recoveryPromptSeen===true,feedback:a.feedback||'',unclear:a.unclear||''};
+ return {bankVersion:v3.version,submittedAt:typeof a.submittedAt==='string'?a.submittedAt:null,profile:{interests:interest,styles:style,exposure},responses:v3.validate(a),stage:a.stage,reviewed:a.reviewed===true,selected,reflections,activityProgress,skipped,flagged,recoveryPromptSeen:a.recoveryPromptSeen===true,feedback:a.feedback||'',unclear:a.unclear||''};
 }
 function profileComplete(a){return a.profile.exposure?.length>0&&Object.keys(a.profile.interests).length===18&&Object.keys(a.profile.styles).length===5;}
 function writtenAnswers(a){return Object.fromEntries(v3.bank.items.filter(i=>['Written scenario','Coding task','SQL task','HTML task'].includes(i.type)&&v3.nonempty(a.responses[i.id])&&!v3.isNotLearned(a.responses[i.id])).map(i=>[i.id,a.responses[i.id]]));}
