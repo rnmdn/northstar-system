@@ -15,8 +15,10 @@ const hash=value=>crypto.createHash('sha256').update(JSON.stringify(value)).dige
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.woff2':'font/woff2','.mp4':'video/mp4'};
 function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.env.ASTRA_DATA_DIR):path.join(__dirname,'.astra-data'),grade=ai.grade,gradeV3,model=process.env.GEMINI_MODEL||'gemini-flash-lite-latest',rfTesting=process.env.NORTHSTAR_RF_ENABLED!=='false'}={}) {
   const cloud=process.env.NORTHSTAR_STORAGE==='supabase';
-  const publicURL=process.env.NORTHSTAR_PUBLIC_URL||process.env.RENDER_EXTERNAL_URL;
+  const vercelHost=process.env.VERCEL_ENV==='production'?process.env.VERCEL_PROJECT_PRODUCTION_URL||process.env.VERCEL_URL:process.env.VERCEL_URL;
+  const publicURL=process.env.NORTHSTAR_PUBLIC_URL||(vercelHost?'https://'+vercelHost:process.env.RENDER_EXTERNAL_URL);
   const publicOrigin=publicURL?new URL(publicURL).origin:null;
+  const allowedOrigins=new Set([publicOrigin,...(process.env.VERCEL_URL?['https://'+process.env.VERCEL_URL]:[])]);
   if(process.env.NODE_ENV==='production'&&(!cloud||process.env.ASTRA_HTTPS!=='true'||!publicOrigin?.startsWith('https://')))throw new Error('Production requires Supabase storage and a canonical HTTPS public URL.');
   const unlock=cloud?()=>{}:lock(dataDir);
   const pending=new Map(),cooldowns=new Map();
@@ -36,20 +38,20 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
   }
   function setCookie(res,token){res.setHeader('Set-Cookie',`astra_grading=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${process.env.ASTRA_HTTPS==='true'?'; Secure':''}`);}
   async function newSession(res,owner){const token=crypto.randomBytes(32).toString('hex');await store(path.join(dataDir,'sessions',`${hash(token)}.json`),{owner,expiresAt:Date.now()+2592000000});setCookie(res,token);}
-  async function body(req){let text='';for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>300000)throw Object.assign(new Error('Submission is too long.'),{status:413});}try{return JSON.parse(text);}catch{throw Object.assign(new Error('Invalid JSON submission.'),{status:400});}}
+  async function body(req){let text='';if(req.body!==undefined){text=Buffer.isBuffer(req.body)?req.body.toString('utf8'):typeof req.body==='string'?req.body:JSON.stringify(req.body);if(Buffer.byteLength(text)>300000)throw Object.assign(new Error('Submission is too long.'),{status:413});}else for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>300000)throw Object.assign(new Error('Submission is too long.'),{status:413});}try{return JSON.parse(text);}catch{throw Object.assign(new Error('Invalid JSON submission.'),{status:400});}}
   const server=http.createServer(async(req,res)=>{
     try{
       const url=new URL(req.url,'http://localhost');
       if(url.pathname==='/healthz'&&req.method==='GET'){if(privateData.ping)await privateData.ping();return send(res,200,{status:'ok'});}
-      if(publicOrigin&&req.headers.host!==new URL(publicOrigin).host)return send(res,403,{error:'Use the NorthStar website address.'});
+      if(publicOrigin&&![...allowedOrigins].some(origin=>origin&&req.headers.host===new URL(origin).host))return send(res,403,{error:'Use the NorthStar website address.'});
       if(process.env.ASTRA_HTTPS!=='true'&&!/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(req.headers.host||''))return send(res,403,{error:'Use the local Astra address.'});
       if(url.pathname.startsWith('/api/')) {
         if(req.method!=='POST')return send(res,405,{error:'Use POST for assessment requests.'});
         const origin=req.headers.origin;
-        if(origin && (publicOrigin?origin!==publicOrigin:origin!==`http://${req.headers.host}` && origin!==`https://${req.headers.host}`))return send(res,403,{error:'Use the assessment from this server.'});
+        if(origin && (publicOrigin?!allowedOrigins.has(origin):origin!==`http://${req.headers.host}` && origin!==`https://${req.headers.host}`))return send(res,403,{error:'Use the assessment from this server.'});
         if(req.headers['sec-fetch-site']==='cross-site')return send(res,403,{error:'Use the assessment from this server.'});
         if(!req.headers['content-type']?.startsWith('application/json'))return send(res,415,{error:'Use JSON assessment requests.'});
-        const forwarded=process.env.RENDER==='true'?req.headers['x-forwarded-for']?.split(',')[0].trim():null;
+        const forwarded=process.env.RENDER==='true'||process.env.VERCEL==='1'?req.headers['x-forwarded-for']?.split(',')[0].trim():null;
         const clientAddress=forwarded&&require('node:net').isIP(forwarded)?forwarded:req.socket.remoteAddress;
         const rateKey=`${clientAddress}:${url.pathname==='/api/storage/resume'?'resume':'api'}`,period=url.pathname==='/api/storage/resume'?600000:60000,maximum=url.pathname==='/api/storage/resume'?20:240;
         for(const [key,value]of requestLimits)if(value.until<Date.now())requestLimits.delete(key);

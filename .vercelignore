@@ -1,0 +1,12 @@
+.astra-data/
+.astra-backups/
+.astra-restored/
+.rf-venv/
+.env
+.env.*
+outputs/
+tests/
+ml/*.py
+ml/requirements.txt
+models/**/*.joblib
+data/

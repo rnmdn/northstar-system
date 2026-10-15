@@ -5,6 +5,8 @@ data/kaggle-audit.json
 outputs/
 
 node_modules/
+public/
+.vercel/
 .npm-cache/
 .astra-data/
 .astra-backups/

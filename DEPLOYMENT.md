@@ -1,5 +1,13 @@
 # Render Free + Supabase Free
 
+## Vercel migration
+
+`vercel.json` publishes only generated `public/` pages/assets to the CDN and routes `/api/*` and `/healthz` to `api/index.js`. The Node function reuses the backend and Supabase adapter, with a 60-second duration and Singapore region. `scripts/build-vercel.cjs` explicitly excludes backend files from the public output. Node 24 is required for the SQL checker; its worker is included in the function bundle.
+
+Import the repository as **Other**, not a Python application or multi-service project. The Python tools are offline research tools, not deployed services. Use Node 24.x. Copy the existing server environment variables from Render, including the exact same NORTHSTAR_STORAGE_KEY and Supabase project configuration. Never generate a replacement encryption key for existing data. Vercel supplies VERCEL_URL and VERCEL_PROJECT_PRODUCTION_URL; optional NORTHSTAR_PUBLIC_URL overrides the canonical public origin for a custom domain.
+
+Browser cookies are domain-specific. Existing users need their recovery code from the Render site to open the same assessment on the Vercel domain. The database and encryption format remain unchanged. The original Render deployment remains available during verification. Vercel does not remove Gemini/Groq quota limits; grading still uses the provider fallback and pending/error behavior documented below. No durable background grading queue is introduced by this hosting change.
+
 ## Deployment record — October 13, 2026
 
 - Public site: https://northstar-x96p.onrender.com
