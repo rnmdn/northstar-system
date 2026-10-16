@@ -8,7 +8,7 @@ const profileKey='astra-student-profile-v1';
 function browser(values,fetchImpl){
   const elements=new Map();let loads=0;
   const element=id=>{if(!elements.has(id))elements.set(id,{hidden:false,value:'',textContent:'',remove(){this.removed=true;},append(){},setAttribute(){},classList:{add(){}}});return elements.get(id);};
-  const panel={innerHTML:'',classList:{add(){}},setAttribute(){},append(){},querySelector(selector){return element(selector);}};
+  const panel={innerHTML:'',classList:{add(){},remove(){}},setAttribute(){},append(){},querySelector(selector){return element(selector);}};
   const listeners={};const location={href:'http://localhost/assessment.html'};
   const context={window:{},location,sessionStorage:{getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,String(value)),removeItem:key=>values.delete(key)},fetch:fetchImpl,AbortSignal,URL,JSON,console,confirm:()=>true,addEventListener:(type,listener)=>listeners[type]=listener,setTimeout:()=>1,clearTimeout(){},document:{head:{append(){}},documentElement:{classList:{remove(){}}},currentScript:{dataset:{modules:'scripts/student.js'}},body:{dataset:{page:'assessment'},append(script){loads++;queueMicrotask(()=>script.onload());}},querySelector:()=>({prepend(){}}),createElement:tag=>tag==='section'?panel:{},addEventListener:(type,listener)=>listeners[type]=listener}};
   vm.runInNewContext(source,context);

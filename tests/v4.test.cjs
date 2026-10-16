@@ -83,7 +83,9 @@ test('Results use the RF ranking, save chosen directions, and show actionable pe
    assert.deepEqual(JSON.parse(cache.get(s.key)).selected,[]);
    assert.equal(window.document.querySelectorAll('.career-card').length,3);
    assert.equal(window.document.querySelectorAll('.career-match').length,0);assert(!window.document.querySelector('.career-cards').textContent.includes('%'));
-   assert.match(window.document.querySelector('.career-preliminary').textContent,/professor review/);
+   assert.equal(window.document.querySelector('.career-preliminary'),null);
+   assert.equal(window.document.querySelector('.career-summary-label'),null);
+   assert.match(window.document.querySelector('.career-match-note').textContent,/order does not measure your potential/);
    assert.equal(window.document.querySelectorAll('.model-match-help').length,0);
    const choice=window.document.querySelector('#v3-paths input');choice.checked=true;
    window.document.querySelector('#v3-paths').onchange({target:choice});

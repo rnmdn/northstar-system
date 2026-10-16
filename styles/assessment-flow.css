@@ -11,6 +11,13 @@
 .bank-v3 .site-header #storage-status::before{content:"";display:inline-block;width:6px;height:6px;margin:0 9px 2px 0;border-radius:50%;background:#9bb7d3}
 .bank-v3 .site-header .storage-panel button{background:#12315b;border-color:#7895ba;color:#fff}
 .bank-v3 .site-header #storage-message{max-width:50ch;color:#fff}
+.bank-v3 .site-header .storage-panel.is-error{order:3;flex:1 0 100%;margin:0;padding:12px 0 14px;border-top:1px solid #324967;color:#ffe1e4}
+.bank-v3 .site-header .storage-panel.is-error .storage-summary{justify-content:flex-start;flex-wrap:wrap;gap:10px 12px}
+.bank-v3 .site-header .storage-panel.is-error #storage-status{flex:1 1 270px}
+.bank-v3 .site-header .storage-panel.is-error #storage-status::before{background:#ff9ea8}
+.bank-v3 .site-header .storage-panel.is-error button{min-height:36px;white-space:nowrap;background:transparent;border-color:#a8bbd2}
+.bank-v3 .site-header .storage-panel.is-error a{color:#fff;text-underline-offset:3px;align-self:center}
+.bank-v3 .site-header .storage-panel.is-error #storage-message{margin:8px 0 0;color:#ffe1e4}
 .bank-v3 .flow-top{background:#06152d;color:#ddf2ff;border-bottom:1px solid #a98552;padding:20px 0}
 .bank-v3 .flow-top .container{gap:36px}
 .bank-v3 .flow-top h1{color:#fff;font:400 32px/1.2 Georgia,serif;letter-spacing:0;margin:0}
@@ -30,6 +37,7 @@
 .bank-v3 .v3-card p{margin:8px 0;line-height:1.55}
 .bank-v3 .v3-actions{border-color:#dce5ef}
 .bank-v3 .v3-panel .button{min-height:50px;padding:13px 23px;border-radius:8px;font:600 16px/1.2 Outfit,"Segoe UI",sans-serif}
+.bank-v3.profile-focused #v3-status:not(:empty){color:#b42332}
 .bank-v3 .v3-note{font-size:13px;line-height:1.6;color:#52677d}
 .bank-v3 .footer{margin-top:auto}
 .bank-v3 .footer-links a{text-underline-offset:4px}
@@ -128,7 +136,7 @@ body.bank-v3[data-page="skills-assessment"] #v3-status:not(:empty){background:#e
 
 body.bank-v3[data-page="results"] .layout{max-width:1200px}
 body.bank-v3[data-page="results"] .v3-panel{max-width:none}
-.career-summary{max-width:75ch;font-size:18px;line-height:1.7}.career-summary-label{font-size:14px;color:#435775;margin-bottom:36px}
+.career-summary{max-width:75ch;font-size:18px;line-height:1.7}
 .bank-v3 .career-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:end;border:0;margin:36px 0 24px}
 .bank-v3 .career-podium .rf-result{display:flex;flex-direction:column;min-width:0;box-sizing:border-box;background:#edf3fa;border:1px solid #cbd9eb;border-radius:14px;padding:26px;min-height:330px}
 .career-podium .podium-place-1{grid-column:2;grid-row:1;min-height:380px!important;background:#e3edfc!important;border-color:#8fa9dc!important}
@@ -169,11 +177,9 @@ body.bank-v3[data-page="results"] .v3-panel{max-width:none}
 .bank-v3 .career-card .podium-breakdown{margin:0;min-height:48px;font-size:15px}
 .career-plan-choice{display:flex;align-items:center;gap:12px;padding-top:14px;border-top:1px solid #dce5ef;min-height:44px;cursor:pointer;font-weight:500;font-size:15px}
 .career-plan-choice input{width:20px;height:20px;margin:0;accent-color:#315ce0;flex:none}
-.career-preliminary{display:flex;align-items:flex-start;gap:18px;background:#eaf1fb;border:1px solid #cad8e8;border-radius:10px;padding:18px 22px;margin:26px 0 18px}
-.career-preliminary>strong{font-size:14px;background:#d9e6fa;padding:5px 9px;border-radius:5px;color:#193c76;flex:none}.career-preliminary p{margin:0;font-size:15px;line-height:1.65;color:#304968}
 .career-match-note{font-size:14px;color:#435775;line-height:1.6;max-width:95ch}
 .career-plan-action{display:flex;justify-content:space-between;align-items:center;gap:28px;margin:40px 0 44px;padding-top:24px;border-top:1px solid #dce5ef}.career-plan-action p{font-size:15px;line-height:1.6;max-width:65ch;margin:0}.career-plan-action .button{flex-shrink:0}
-@media(max-width:950px){.bank-v3 .career-cards{grid-template-columns:1fr}.bank-v3 .career-card h3,.bank-v3 .career-card .career-description,.career-first-step{min-height:0}.career-card-rank{justify-content:flex-start;gap:16px}.career-plan-action{flex-direction:column;align-items:stretch;gap:20px}.career-plan-action .button{text-align:center}.career-preliminary{flex-direction:column;gap:12px}}
+@media(max-width:950px){.bank-v3 .career-cards{grid-template-columns:1fr}.bank-v3 .career-card h3,.bank-v3 .career-card .career-description,.career-first-step{min-height:0}.career-card-rank{justify-content:flex-start;gap:16px}.career-plan-action{flex-direction:column;align-items:stretch;gap:20px}.career-plan-action .button{text-align:center}}
 
 /* Score-based learning starts with a resource and a concrete practice step. */
 .learning-rules{font-size:14px;color:#435775;max-width:85ch}

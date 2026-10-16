@@ -24,8 +24,9 @@
   }
   function note(message) { const field=$('storage-message');field.textContent=message;field.hidden=!message; }
   function failure(error) {
+    panel.classList.add('is-error');
     $('storage-retry').hidden=false;$('storage-download').hidden=false;$('storage-reload').hidden=!conflict;
-    note(conflict?error.message:'Server saving is unavailable. Your draft stays in this tab; you can still review it.');
+    note(conflict?error.message:'');
   }
   function pendingDraft() { try{return JSON.parse(sessionStorage.getItem('astra-pending-draft'));}catch{return null;} }
   function sameProfile(left,right) {
@@ -37,6 +38,7 @@
   function snapshot() { return Object.fromEntries(keys.filter(key => sessionStorage.getItem(key) !== null).map(key => [key,sessionStorage.getItem(key)])); }
   function clear() { keys.forEach(key => sessionStorage.removeItem(key)); sessionStorage.removeItem('astra-record-id');sessionStorage.removeItem('astra-pending-draft'); }
   function hydrate(record) {
+    panel.classList.remove('is-error');note('');
     clear();
     for (const [key,value] of Object.entries(record.state)) if(keys.includes(key)) sessionStorage.setItem(key,value);
     sessionStorage.setItem('astra-record-id',record.recordId);
@@ -54,7 +56,7 @@
     if(saving) { await saving; if(dirty) return flush(); return; }
     if(!dirty) return;
     const state = snapshot(); dirty = false; status('Saving your assessment…');
-    saving = post('save',{revision,state,recordId:sessionStorage.getItem('astra-record-id')}).then(record => { revision = record.revision; if(dirty)markDraft();else sessionStorage.removeItem('astra-pending-draft'); status('Saved on this server');note('');if(!recoveryPage){$('storage-retry').hidden=true;$('storage-download').hidden=true;$('storage-reload').hidden=true;} }).catch(error => {
+    saving = post('save',{revision,state,recordId:sessionStorage.getItem('astra-record-id')}).then(record => { revision = record.revision; if(dirty)markDraft();else sessionStorage.removeItem('astra-pending-draft'); status('Saved on this server');note('');panel.classList.remove('is-error');if(!recoveryPage){$('storage-retry').hidden=true;$('storage-download').hidden=true;$('storage-reload').hidden=true;} }).catch(error => {
       dirty = true; conflict = error.status === 409;
       status(conflict?'Newer answers exist in another tab — saving paused.':'Not saved to the server — keep this tab open and retry.');
       markDraft();failure(error);
