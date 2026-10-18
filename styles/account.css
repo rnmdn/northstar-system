@@ -11,3 +11,5 @@ body[data-account]{font-family:Outfit,system-ui,sans-serif}.account-layout .acco
 
 /* A quiet, distinct account background. */
 .account-photo,.account-photo .account-backdrop{background:#06152d}.account-photo .account-backdrop{background:radial-gradient(ellipse at 84% 48%,#163661 0%,#0b2140 25%,#06152d 62%)}.account-photo .account-backdrop:after{display:none}.account-guide-star{position:absolute;left:81%;top:38%;width:12px;height:12px;background:#e3c38e;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)}@media(max-width:600px){.account-photo .account-backdrop{background:radial-gradient(ellipse at 100% 15%,#102c50,#06152d 65%)}.account-guide-star{left:auto;right:32px;top:110px;width:9px;height:9px}}
+
+.account-orbits{position:absolute;width:min(70vw,850px);height:auto;right:-5%;top:50%;transform:translateY(-50%);pointer-events:none}.account-photo .account-backdrop{background:radial-gradient(ellipse at 78% 44%,#142e50 0%,#0a1e38 35%,#06152d 72%)}@media(max-width:800px){.account-orbits{width:760px;right:-440px;opacity:.55}}
