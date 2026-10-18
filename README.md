@@ -50,6 +50,10 @@ npm test
 npm run check:rf
 ```
 
+## Student accounts
+
+Email/password sign-in, verification, reset and account-linked progress use Supabase Auth. See [ACCOUNTS.md](ACCOUNTS.md) for sender configuration, existing-record claiming, deployment flags and verification. Email registration is gated until the production sender is ready.
+
 ## Research status
 
 The mapping and learning-start thresholds are preliminary. Job-posting classification accuracy does not establish student recommendation accuracy. See ASSESSMENT-V4.md, STUDENT-MAPPING.md, LEARNING-RESOURCES.md and RF-INTEGRATION-LOG.md.

@@ -13,7 +13,7 @@ const assessmentStorage=require('./storage/assessment');
 const {lock}=require('./storage/maintenance');
 const hash=value=>crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.woff2':'font/woff2','.mp4':'video/mp4'};
-function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.env.ASTRA_DATA_DIR):path.join(__dirname,'.astra-data'),grade=ai.grade,gradeV3,model=process.env.GEMINI_MODEL||'gemini-flash-lite-latest',rfTesting=process.env.NORTHSTAR_RF_ENABLED!=='false'}={}) {
+function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.env.ASTRA_DATA_DIR):path.join(__dirname,'.astra-data'),grade=ai.grade,gradeV3,model=process.env.GEMINI_MODEL||'gemini-flash-lite-latest',authProvider=undefined,authRequired=process.env.NORTHSTAR_AUTH_REQUIRED==='true',rfTesting=process.env.NORTHSTAR_RF_ENABLED!=='false'}={}) {
   const cloud=process.env.NORTHSTAR_STORAGE==='supabase';
   const vercelHost=process.env.VERCEL_ENV==='production'?process.env.VERCEL_PROJECT_PRODUCTION_URL||process.env.VERCEL_URL:process.env.VERCEL_URL;
   const publicURL=process.env.NORTHSTAR_PUBLIC_URL||(vercelHost?'https://'+vercelHost:process.env.RENDER_EXTERNAL_URL);
@@ -25,18 +25,24 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
   const requestLimits=new Map();
   const privateData=cloud?require('./storage/supabase-store').supabaseStore(dataDir):privateStore(dataDir);
   const readRecord=privateData.read,store=privateData.write;
+  const provider=authProvider===undefined?require('./storage/auth-provider').authProvider():authProvider;
+  const account=provider?require('./storage/accounts').accounts({provider,store:privateData,dataDir,secure:process.env.ASTRA_HTTPS==='true',origin:publicOrigin||'http://127.0.0.1:8766'}):null;
   const recordPath=owner=>path.join(dataDir,owner,'assessment.json');
   const send=(res,status,data,extra={})=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY',...extra});res.end(JSON.stringify(data));};
   async function session(req,res) {
+    if(authRequired&&!account)throw Object.assign(new Error('Account sign-in is not configured. Please retry later.'),{status:503});
+    if(account){const signed=await account.userSession(req);if(signed){let owner=await account.owner(req);if(!owner)throw Object.assign(new Error('Your account could not be loaded. Sign in again.'),{status:401});return owner;}if(authRequired)throw Object.assign(new Error('Sign in to continue your assessment.'),{status:401});}
     let token=req.headers.cookie?.match(/(?:^|;\s*)astra_grading=([a-f0-9]{64})(?:;|$)/)?.[1];
     if(!token){token=crypto.randomBytes(32).toString('hex');setCookie(res,token);}
     const id=hash(token);
     const mapped=await readRecord(path.join(dataDir,'sessions',`${id}.json`));
     if(mapped && mapped.expiresAt<Date.now()){const nextOwner=hash(crypto.randomBytes(32).toString('hex'));await newSession(res,nextOwner);return nextOwner;}
     if(!mapped)await store(path.join(dataDir,'sessions',`${id}.json`),{owner:id,expiresAt:Date.now()+2592000000});
-    return mapped?.owner||id;
+    const owner=mapped?.owner||id;
+    if((await readRecord(recordPath(owner)))?.accountUserId)throw Object.assign(new Error('This assessment belongs to an account. Sign in to continue.'),{status:401});
+    return owner;
   }
-  function setCookie(res,token){res.setHeader('Set-Cookie',`astra_grading=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${process.env.ASTRA_HTTPS==='true'?'; Secure':''}`);}
+  function setCookie(res,token){const previous=res.getHeader('Set-Cookie')||[];res.setHeader('Set-Cookie',[...(Array.isArray(previous)?previous:[previous]),`astra_grading=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${process.env.ASTRA_HTTPS==='true'?'; Secure':''}`]);}
   async function newSession(res,owner){const token=crypto.randomBytes(32).toString('hex');await store(path.join(dataDir,'sessions',`${hash(token)}.json`),{owner,expiresAt:Date.now()+2592000000});setCookie(res,token);}
   async function body(req){let text='';if(req.body!==undefined){text=Buffer.isBuffer(req.body)?req.body.toString('utf8'):typeof req.body==='string'?req.body:JSON.stringify(req.body);if(Buffer.byteLength(text)>300000)throw Object.assign(new Error('Submission is too long.'),{status:413});}else for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>300000)throw Object.assign(new Error('Submission is too long.'),{status:413});}try{return JSON.parse(text);}catch{throw Object.assign(new Error('Invalid JSON submission.'),{status:400});}}
   const server=http.createServer(async(req,res)=>{
@@ -53,10 +59,30 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
         if(!req.headers['content-type']?.startsWith('application/json'))return send(res,415,{error:'Use JSON assessment requests.'});
         const forwarded=process.env.RENDER==='true'||process.env.VERCEL==='1'?req.headers['x-forwarded-for']?.split(',')[0].trim():null;
         const clientAddress=forwarded&&require('node:net').isIP(forwarded)?forwarded:req.socket.remoteAddress;
-        const rateKey=`${clientAddress}:${url.pathname==='/api/storage/resume'?'resume':'api'}`,period=url.pathname==='/api/storage/resume'?600000:60000,maximum=url.pathname==='/api/storage/resume'?20:240;
+        const isAuth=url.pathname.startsWith('/api/auth/')&&!url.pathname.endsWith('/status');
+        const rateKey=`${clientAddress}:${isAuth?'auth':url.pathname==='/api/storage/resume'?'resume':'api'}`,period=url.pathname==='/api/storage/resume'?600000:60000,maximum=isAuth?12:url.pathname==='/api/storage/resume'?20:240;
         for(const [key,value]of requestLimits)if(value.until<Date.now())requestLimits.delete(key);
         let rate=requestLimits.get(rateKey);if(!rate){rate={count:0,until:Date.now()+period};requestLimits.set(rateKey,rate);}if(++rate.count>maximum)return send(res,429,{error:'Too many requests. Retry later.',retryAfter:Math.ceil((rate.until-Date.now())/1000)},{'Retry-After':String(Math.ceil((rate.until-Date.now())/1000))});
         const input=await body(req);
+        if(url.pathname.startsWith('/api/auth/')){
+          const name=url.pathname.slice('/api/auth/'.length);
+          if(!account)return send(res,name==='status'?200:503,name==='status'?{enabled:false,user:null}:{error:'Account sign-in is not configured yet.'});
+          if(name!=='claim')return await privateData.exclusive(async()=>send(res,200,await account.route(req,res,name,input)));
+          return await privateData.exclusive(async()=>{
+            const signed=await account.userSession(req);if(!signed)return send(res,401,{error:'Sign in before linking your assessment.'});
+            const code=typeof input.code==='string'?input.code.replace(/[-\s]/g,'').toLowerCase():'';
+            if(!/^[a-f0-9]{48}$/.test(code))return send(res,403,{error:'That recovery code could not be verified.'});
+            const recovery=await readRecord(path.join(dataDir,'recovery',hash(code)+'.json'));
+            const record=recovery&&await readRecord(recordPath(recovery.owner));
+            if(!record||record.recoveryHash!==hash(code))return send(res,403,{error:'That recovery code could not be verified.'});
+            if(record.accountUserId&&record.accountUserId!==signed.userId)return send(res,403,{error:'This assessment is already linked to another account.'});
+            const existing=await account.owner(req),existingRecord=existing&&await readRecord(recordPath(existing));
+            if(existing!==recovery.owner&&existingRecord&&Object.keys(existingRecord.state).length)return send(res,409,{error:'Your account already has saved answers. Linking would replace them, so no changes were made.'});
+            await store(recordPath(recovery.owner),{...record,accountUserId:signed.userId});await account.link(signed.userId,recovery.owner);
+            return send(res,200,{linked:true});
+          });
+        }
+        if(account&&!url.pathname.startsWith('/api/storage/'))await privateData.exclusive(()=>account.userSession(req));
         if(url.pathname.startsWith('/api/storage/')) {
           return await privateData.exclusive(async()=>{
             const route=url.pathname.slice('/api/storage/'.length);
@@ -67,13 +93,18 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
               if(!recovery)return send(res,403,{error:'That recovery code could not be verified.'});
               const record=await readRecord(recordPath(recovery.owner));
               if(!record || record.recoveryHash!==hash(code))return send(res,403,{error:'That recovery code could not be verified.'});
+              const signed=account&&await account.userSession(req);
+              if(record.accountUserId&&record.accountUserId!==signed?.userId)return send(res,403,{error:'Sign in to the account linked to this assessment.'});
+              if(signed)return send(res,409,{error:'Use My assessment to link a recovery code to your account.'});
               await newSession(res,recovery.owner);
               return send(res,200,{revision:record.revision,recordId:record.recordId,...await assessmentStorage.enrich(record.state,recovery.owner,privateData,dataDir,model)});
             }
             let owner=await session(req,res),record=await readRecord(recordPath(owner));
+            if(route==='new'&&account&&await account.userSession(req))return send(res,409,{error:'Your account already has an assessment. Resume it from My assessment.'});
+            if(route==='logout'&&account&&await account.userSession(req))return send(res,200,await account.route(req,res,'logout',{}));
             if(route==='new'){owner=hash(crypto.randomBytes(32).toString('hex'));await newSession(res,owner);record=null;}
-            if(!record){record={recordId:crypto.randomUUID(),revision:0,state:{},createdAt:new Date().toISOString()};await store(recordPath(owner),record);}
-            if(route==='load'||route==='new')return send(res,200,{recordId:record.recordId,revision:record.revision,...await assessmentStorage.enrich(record.state,owner,privateData,dataDir,model)});
+            if(!record){record={recordId:crypto.randomUUID(),revision:0,state:{},createdAt:new Date().toISOString(),...(req.northstarAccount?{accountUserId:req.northstarAccount.userId}:{})};await store(recordPath(owner),record);}
+            if(route==='load'||route==='new')return send(res,200,{recordId:record.recordId,revision:record.revision,accountLinked:!!req.northstarAccount,...await assessmentStorage.enrich(record.state,owner,privateData,dataDir,model)});
             if(route==='recovery') {
               const code=crypto.randomBytes(24).toString('hex');
               record.recoveryHash=hash(code);

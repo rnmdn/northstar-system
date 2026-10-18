@@ -5,7 +5,9 @@
   for (const src of modules) { const link=document.createElement('link');link.rel='preload';link.as='script';link.href=src;document.head.append(link); }
   const recoveryPage = document.body.dataset.page === 'resume';
   const keys = ['astra-item-bank-v4','astra-item-bank-v3','astra-student-profile-v1','astra-research-pilot-v0-1','astra-exploration-plan-v1','astra-assessment-unlocked-v1','astra-skills-stage-v3','astra-skills-return-v1','astra-review-complete','astra-skills-complete','astra-results-complete'];
+  let accountLinked=false;
   let revision = 0, dirty = false, saving = null, timer, conflict = false, ready = false, loadedModules = 0, navigating = false;
+  const accountLink=document.createElement('a');accountLink.href='account.html';accountLink.textContent='My assessment';accountLink.className='account-access';const nav=document.querySelector('.site-header nav');if(nav)nav.append(accountLink);
   const panel = document.createElement('section');
   panel.className = 'storage-panel';
   panel.setAttribute('aria-label','Assessment storage');
@@ -56,7 +58,7 @@
     if(saving) { await saving; if(dirty) return flush(); return; }
     if(!dirty) return;
     const state = snapshot(); dirty = false; status('Saving your assessment…');
-    saving = post('save',{revision,state,recordId:sessionStorage.getItem('astra-record-id')}).then(record => { revision = record.revision; if(dirty)markDraft();else sessionStorage.removeItem('astra-pending-draft'); status('Saved on this server');note('');panel.classList.remove('is-error');if(!recoveryPage){$('storage-retry').hidden=true;$('storage-download').hidden=true;$('storage-reload').hidden=true;} }).catch(error => {
+    saving = post('save',{revision,state,recordId:sessionStorage.getItem('astra-record-id')}).then(record => { revision = record.revision; if(dirty)markDraft();else sessionStorage.removeItem('astra-pending-draft'); status(accountLinked?'Saved to your account':'Saved on this server');note('');panel.classList.remove('is-error');if(!recoveryPage){$('storage-retry').hidden=true;$('storage-download').hidden=true;$('storage-reload').hidden=true;} }).catch(error => {
       dirty = true; conflict = error.status === 409;
       status(conflict?'Newer answers exist in another tab — saving paused.':'Not saved to the server — keep this tab open and retry.');
       markDraft();failure(error);
@@ -114,8 +116,10 @@
     const local = snapshot(), previousId=sessionStorage.getItem('astra-record-id'),draft=pendingDraft();
     let record;
     try {record=await post('load');}
-    catch(error){ready=false;dirty=Object.keys(local).length>0;if(draft)revision=draft.revision;status('Draft kept in this tab — server saving unavailable');failure(error);await loadModules();return;}
-    if(!draft && previousId && local['astra-student-profile-v1'] && !sameProfile(local['astra-student-profile-v1'],record.state['astra-student-profile-v1'])) {
+    catch(error){if(error.status===401){location.href='login.html';throw error;}ready=false;dirty=Object.keys(local).length>0;if(draft)revision=draft.revision;status('Draft kept in this tab — server saving unavailable');failure(error);await loadModules();return;}
+    accountLinked=!!record.accountLinked;
+    if(accountLinked&&previousId&&previousId!==record.recordId){if(draft){ready=false;conflict=true;failure(new Error('This tab has answers from another assessment. Download them before loading this account’s saved answers.'));throw new Error('Download this tab’s draft from Recovery options before opening another account.');}clear();}
+    if(!accountLinked && !draft && previousId && local['astra-student-profile-v1'] && !sameProfile(local['astra-student-profile-v1'],record.state['astra-student-profile-v1'])) {
       ready=true;dirty=true;conflict=true;revision=-1;markDraft();
       status('Draft kept in this tab — saving paused');failure(new Error('This tab has profile answers that differ from the server copy. Download the draft before loading saved answers.'));await loadModules();return;
     }
@@ -124,7 +128,7 @@
       status('Draft kept in this tab — saving paused');failure(new Error('The server has a newer or different assessment. Download this draft before loading saved answers.'));await loadModules();return;
     }
     // Import only an existing tab's legacy draft into a completely empty record.
-    const importDraft=(!previousId&&record.revision===0&&Object.keys(record.state).length===0&&Object.keys(local).length>0)||(draft && (!draft.recordId || draft.recordId===record.recordId) && draft.revision===record.revision);
+    const importDraft=(!accountLinked&&!previousId&&record.revision===0&&Object.keys(record.state).length===0&&Object.keys(local).length>0)||(draft && (!draft.recordId || draft.recordId===record.recordId) && draft.revision===record.revision);
     hydrate(record); ready=true;
     if(importDraft) { for(const [key,value]of Object.entries(local))sessionStorage.setItem(key,value);dirty=true;markDraft();try{await flush();}catch{/* Draft is still usable when saving fails. */} }
     else status('Saved on this server');
