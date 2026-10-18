@@ -10,7 +10,7 @@ for (const directory of ['assets', 'styles', 'scripts']) {
       const name = path.join(relative, entry.name);
       if (entry.isSymbolicLink()) throw Error('Public assets must not be symlinks.');
       if (entry.isDirectory()) walk(name);
-      else if (/\.(?:js|html|css|png|jpe?g|svg|woff2|mp4)$/.test(entry.name)) {
+      else if (/\.(?:js|html|css|webp|png|jpe?g|svg|woff2|mp4)$/.test(entry.name)) {
         fs.mkdirSync(path.dirname(path.join(output, name)), { recursive: true });
         fs.copyFileSync(path.join(root, name), path.join(output, name));
       }

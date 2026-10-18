@@ -12,7 +12,7 @@ const {privateStore}=require('./storage/private-store');
 const assessmentStorage=require('./storage/assessment');
 const {lock}=require('./storage/maintenance');
 const hash=value=>crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
-const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.woff2':'font/woff2','.mp4':'video/mp4'};
+const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.woff2':'font/woff2','.mp4':'video/mp4'};
 function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.env.ASTRA_DATA_DIR):path.join(__dirname,'.astra-data'),grade=ai.grade,gradeV3,model=process.env.GEMINI_MODEL||'gemini-flash-lite-latest',authProvider=undefined,authRequired=process.env.NORTHSTAR_AUTH_REQUIRED==='true'||(process.env.NODE_ENV==='production'&&process.env.NORTHSTAR_AUTH_REQUIRED!=='false'),rfTesting=process.env.NORTHSTAR_RF_ENABLED!=='false'}={}) {
   const cloud=process.env.NORTHSTAR_STORAGE==='supabase';
   const vercelHost=process.env.VERCEL_ENV==='production'?process.env.VERCEL_PROJECT_PRODUCTION_URL||process.env.VERCEL_URL:process.env.VERCEL_URL;
