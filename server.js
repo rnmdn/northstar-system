@@ -67,6 +67,7 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
         if(url.pathname.startsWith('/api/auth/')){
           const name=url.pathname.slice('/api/auth/'.length);
           if(!account)return send(res,name==='status'?200:503,name==='status'?{enabled:false,user:null}:{error:'Account sign-in is not configured yet.'});
+          if(name==='status'&&!account.readCookie(req,'northstar_account'))return send(res,200,await account.route(req,res,name,input));
           if(name!=='claim')return await privateData.exclusive(async()=>send(res,200,await account.route(req,res,name,input)));
           return await privateData.exclusive(async()=>{
             const signed=await account.userSession(req);if(!signed)return send(res,401,{error:'Sign in before linking your assessment.'});
