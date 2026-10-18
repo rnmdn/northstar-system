@@ -1,4 +1,8 @@
 (() => {
+  for(const toggle of document.querySelectorAll('[data-password-toggle]')){
+    const input=document.getElementById(toggle.dataset.passwordToggle);
+    toggle.addEventListener('click',()=>{const visible=input.type==='password';input.type=visible?'text':'password';toggle.setAttribute('aria-pressed',String(visible));toggle.setAttribute('aria-label',(visible?'Hide ':'Show ')+(input.id==='confirm'?'confirmed password':'password'));});
+  }
   const mode=document.body.dataset.account,message=document.getElementById('account-message'),content=document.getElementById('account-content'),form=document.getElementById('account-form');
   function note(text,error=false){message.textContent=text;message.classList.toggle('error',error);}
   async function post(route,data={}){const response=await fetch('/api/'+route,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(20000)});const result=await response.json();if(!response.ok)throw new Error(result.error||'Please retry.');return result;}
@@ -6,7 +10,7 @@
   // Keep an existing unsaved tab recoverable; never import it into another account.
   function canSwitch(){if(sessionStorage.getItem('astra-pending-draft')){note('This tab has unsaved answers. Open your assessment and save or download them before switching accounts.',true);return false;}return true;}
   form?.addEventListener('submit',async event=>{
-    event.preventDefault();const button=form.querySelector('button'),email=form.elements.email?.value,password=form.elements.password?.value;
+    event.preventDefault();const button=form.querySelector('button[type=submit]'),email=form.elements.email?.value,password=form.elements.password?.value;
     if(form.elements.confirm&&password!==form.elements.confirm.value){form.elements.confirm.setCustomValidity('The passwords do not match.');form.elements.confirm.reportValidity();return;}
     if(mode==='login'&&!canSwitch())return;
     button.disabled=true;note('Please wait…');
