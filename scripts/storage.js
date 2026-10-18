@@ -113,6 +113,12 @@
   });
   addEventListener('beforeunload',event => { if(!navigating&&(dirty||saving)){event.preventDefault();event.returnValue='';} });
   async function boot() {
+    if(!recoveryPage){
+      const response=await fetch('/api/auth/status',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
+      if(!response.ok)throw new Error('Sign-in could not be checked. Retry loading.');
+      const auth=await response.json();
+      if(auth.enabled&&!auth.user){navigating=true;location.href='login.html';throw new Error('Sign in to continue your assessment.');}
+    }
     const local = snapshot(), previousId=sessionStorage.getItem('astra-record-id'),draft=pendingDraft();
     let record;
     try {record=await post('load');}

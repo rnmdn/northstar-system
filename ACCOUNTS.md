@@ -29,7 +29,7 @@ In Supabase Authentication:
 
 Set `NORTHSTAR_AUTH_EMAIL_READY=true` only after testing real signup and reset email delivery. In production, registration and reset remain unavailable until that flag is set, with a clear notice and Recovery options. Existing anonymous assessments remain usable while email setup is incomplete. Sign-in works for existing confirmed accounts.
 
-Optional `NORTHSTAR_AUTH_REQUIRED=true` enforces sign-in for assessment API access. Leave it unset during migration so existing anonymous students can obtain recovery codes and link their records. The UI offers **Sign in** on Home and **My assessment** throughout the journey.
+Production requires sign-in for assessment API access by default. Existing anonymous students can link saved records using an existing recovery code after signing in. `NORTHSTAR_AUTH_REQUIRED=false` is an explicit migration-only opt-out. The UI offers **Sign in** on Home and **My assessment** throughout the journey.
 
 Email confirmation/reset use PKCE with a server-held verifier and a one-hour flow cookie. Links must open in the browser that requested them. A reset session permits one password update within 15 minutes. On another device, request a fresh reset there. Passwords require at least 10 characters; Supabase may enforce stronger project rules.
 
