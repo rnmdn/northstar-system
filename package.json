@@ -12,7 +12,10 @@
     "storage:backup": "node scripts/storage-admin.cjs backup",
     "check:ai:v3": "node scripts/check-ai-v3.cjs",
     "check:rf": "node --test tests/rf.test.cjs",
-    "test:accounts": "node --test --test-isolation=none tests/accounts.test.cjs tests/account-ui.test.cjs"
+    "test:accounts": "node --test --test-isolation=none tests/accounts.test.cjs tests/account-ui.test.cjs",
+    "start:local": "node --env-file=.env.local server.js",
+    "test:questions": "node --test --test-isolation=none tests/question-bank.test.cjs tests/technical-report.test.cjs",
+    "test:database": "node --test --test-isolation=none tests/question-database.test.cjs tests/database-backup.test.cjs"
   },
   "type": "commonjs",
   "dependencies": {

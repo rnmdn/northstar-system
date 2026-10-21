@@ -61,3 +61,13 @@ The mapping and learning-start thresholds are preliminary. Job-posting classific
 ## Hosting status
 
 NorthStar is deployed at https://northstar-system-one.vercel.app using Vercel Hobby and encrypted Supabase storage. The previous Render deployment remains available. Existing Render assessments can be opened on Vercel using their recovery codes. Live recovery, submitted-answer locks, SQL grading, cached grades and RF recommendations passed using fictional assessments. Gemini is the primary grader, with Groq as backup; hosting changes do not remove provider quotas. Independent grading calibration is still pending. Local development retains encrypted file storage. See DEPLOYMENT.md for configuration and verification details. GitHub Pages alone cannot run the server.
+
+## Local account sign-in
+
+Run `npm run start:local` after setting the ignored `.env.local` file with `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `NORTHSTAR_PUBLIC_URL=http://127.0.0.1:8766`, `NORTHSTAR_AUTH_REQUIRED=true` and `PORT=8766`. Supabase must allow the exact local `/auth-callback.html` redirect. Existing Supabase accounts can sign in; local encrypted assessment data stays separate from production. Never commit local environment files.
+
+## Soft-skills question bank
+
+The separate soft-skills pilot now has an account-linked database module and an authorized question editor. See [QUESTION-BANK.md](QUESTION-BANK.md) for tables, draft editing, review/publication rules, access and verification. Soft-skills questions remain drafts until their scoring rubrics are reviewed. Technical questions and the Random Forest are unchanged by this module.
+
+See [DATABASE-OPERATIONS.md](DATABASE-OPERATIONS.md) for private backups, verified isolated recovery, editor history and structured technical reporting. Reports contain progress and authoritative score metadata; full responses remain encrypted.

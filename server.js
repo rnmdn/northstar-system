@@ -27,6 +27,16 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
   const readRecord=privateData.read,store=privateData.write;
   const provider=authProvider===undefined?require('./storage/auth-provider').authProvider():authProvider;
   const account=provider?require('./storage/accounts').accounts({provider,store:privateData,dataDir,secure:process.env.ASTRA_HTTPS==='true',origin:publicOrigin||'http://127.0.0.1:8766'}):null;
+  const questionDatabase=require('./storage/question-bank').questionBank();
+  async function syncReporting(record, enrichedState=record.state, scoreSets={}) {
+    if(process.env.NORTHSTAR_TECHNICAL_REPORTS==='false'||!privateData.syncTechnical||!record.accountUserId)return;
+    for(const version of ['3.0','4.0']){
+      const key=require('./storage/v3').forVersion(version).key;
+      if(!scoreSets[version]&&enrichedState[key])scoreSets[version]=JSON.parse(enrichedState[key]).scores;
+    }
+    try{await require('./storage/technical-report').syncTechnical(record,privateData.syncTechnical,scoreSets);}
+    catch{console.warn('Technical reporting sync deferred; assessment remains saved.');}
+  }
   const recordPath=owner=>path.join(dataDir,owner,'assessment.json');
   const send=(res,status,data,extra={})=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY',...extra});res.end(JSON.stringify(data));};
   async function session(req,res) {
@@ -83,6 +93,16 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
             return send(res,200,{linked:true});
           });
         }
+        if(url.pathname.startsWith('/api/questions/')){
+          if(!account)return send(res,401,{error:'Sign in to open the question bank.'});
+          const signed=await privateData.exclusive(()=>account.userSession(req));
+          if(!signed)return send(res,401,{error:'Sign in to open the question bank.'});
+          const parts=url.pathname.slice('/api/questions/'.length).split('/');
+          if(parts.length!==2||!['admin','student'].includes(parts[0]))return send(res,404,{error:'Question endpoint not found.'});
+          const allowed=parts[0]==='admin'?['list','get','create','save','publish','history']:['load','save','submit'];
+          if(!allowed.includes(parts[1]))return send(res,404,{error:'Question action not found.'});
+          return send(res,200,await questionDatabase.request(parts[0],parts[1],input,signed.accessToken));
+        }
         if(account&&!url.pathname.startsWith('/api/storage/'))await privateData.exclusive(()=>account.userSession(req));
         if(url.pathname.startsWith('/api/storage/')) {
           return await privateData.exclusive(async()=>{
@@ -105,7 +125,11 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
             if(route==='logout'&&account&&await account.userSession(req))return send(res,200,await account.route(req,res,'logout',{}));
             if(route==='new'){owner=hash(crypto.randomBytes(32).toString('hex'));await newSession(res,owner);record=null;}
             if(!record){record={recordId:crypto.randomUUID(),revision:0,state:{},createdAt:new Date().toISOString(),...(req.northstarAccount?{accountUserId:req.northstarAccount.userId}:{})};await store(recordPath(owner),record);}
-            if(route==='load'||route==='new')return send(res,200,{recordId:record.recordId,revision:record.revision,accountLinked:!!req.northstarAccount,...await assessmentStorage.enrich(record.state,owner,privateData,dataDir,model)});
+            if(route==='load'||route==='new'){
+              const enriched=await assessmentStorage.enrich(record.state,owner,privateData,dataDir,model);
+              await syncReporting(record,enriched.state);
+              return send(res,200,{recordId:record.recordId,revision:record.revision,accountLinked:!!req.northstarAccount,...enriched});
+            }
             if(route==='recovery') {
               const code=crypto.randomBytes(24).toString('hex');
               record.recoveryHash=hash(code);
@@ -130,6 +154,7 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
               const enriched=await assessmentStorage.enrich(clean,owner,privateData,dataDir,model);
               record={...record,...enriched,revision:record.revision+1,updatedAt:new Date().toISOString()};
               await store(recordPath(owner),record);
+              await syncReporting(record);
               return send(res,200,{recordId:record.recordId,revision:record.revision,savedAt:record.updatedAt});
             }
             return send(res,404,{error:'Storage endpoint not found.'});
@@ -166,7 +191,7 @@ function createServer({dataDir=process.env.ASTRA_DATA_DIR?path.resolve(process.e
               return current;
             });record=submission;
           }
-          const completeScores=async()=>{const result=await v3Storage.scores(a,owner,privateData,dataDir,model);if(record.state[v3Storage.key])result.features=v3Storage.features({...v3Storage.validate(JSON.parse(record.state[v3Storage.key])),responses},result);result.submittedAt=record.state[v3Storage.key]?JSON.parse(record.state[v3Storage.key]).submittedAt||null:null;result.recordRevision=record.revision;return result;};
+          const completeScores=async()=>{const result=await v3Storage.scores(a,owner,privateData,dataDir,model);if(record.state[v3Storage.key])result.features=v3Storage.features({...v3Storage.validate(JSON.parse(record.state[v3Storage.key])),responses},result);result.submittedAt=record.state[v3Storage.key]?JSON.parse(record.state[v3Storage.key]).submittedAt||null:null;result.recordRevision=record.revision;await syncReporting(record,record.state,{[v3.version]:result});return result;};
           if(url.pathname==='/api/v3/score'||url.pathname==='/api/v3/submit'){
             const file=path.join(dataDir,owner,v3Storage.prefix+'-objective-'+v3Storage.objectiveHash(a)+'.json');
             if(!await readRecord(file))await store(file,await v3.score(a));

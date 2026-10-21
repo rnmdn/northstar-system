@@ -15,7 +15,7 @@
     if(mode==='login'&&!canSwitch())return;
     button.disabled=true;note('Please wait…');
     try{const result=await post('auth/'+mode,{email,password});form.reset();
-      if(mode==='login'){clearCache();location.href='account.html';}
+      if(mode==='login'){clearCache();location.href='index.html';}
       else if(mode==='password'){note('Password updated. You can return to My assessment.');content.innerHTML='<a class="button button-dark" href="account.html">My assessment</a>';form.hidden=true;}
       else{note(result.message);form.hidden=true;}
     }catch(error){note(error.name==='TimeoutError'?'The request timed out. Please retry.':error.message,true);}finally{button.disabled=false;}
@@ -30,8 +30,9 @@
       const result=await post('auth/exchange',{code});clearCache();location.replace(result.recovery?'reset-password.html':'account.html');return;
     }
     const auth=await post('auth/status');
-    if(!auth.enabled){note('Account sign-in is being set up. Your existing assessment is still available through Recovery options.',true);if(form)form.hidden=true;return;}
+    if(!auth.enabled){note('Account sign-in is being set up. Your existing assessment is still available through Recovery options.',true);if(form){const submit=form.querySelector('button[type=submit]');if(submit)submit.disabled=true;}return;}
     if((mode==='register'||mode==='recover')&&!auth.emailReady){note('Account emails are being configured. You can still open your existing assessment through Recovery options.');form.hidden=true;return;}
+    if(auth.user&&(mode==='login'||mode==='register')){location.replace('account.html');return;}
     if(mode!=='dashboard')return;
     if(!auth.user){location.replace('login.html');return;}
     note('Signed in as '+auth.user.email);
@@ -42,7 +43,7 @@
     const summary=document.createElement('section');summary.className='account-summary';
     const heading=document.createElement('h2');heading.textContent=assessment.submittedAt?'Assessment submitted':total?'Assessment in progress':'Ready when you are';
     const status=document.createElement('p');status.textContent=assessment.submittedAt?'Your submitted answers are locked. You can review scores and grading status.':`${total} of 48 skill items answered. Your progress saves to this account.`;
-    const resume=document.createElement('a');resume.className='button button-dark';resume.href=target;resume.textContent=assessment.submittedAt?'View my results':total?'Continue assessment':'Start assessment';summary.append(heading,status,resume);content.append(summary);
+    const resume=document.createElement('a');resume.className='button button-dark';resume.href=target;resume.textContent=assessment.submittedAt?'View my results':total?'Continue assessment':'Start assessment';const progress=document.createElement('progress');progress.className='account-progress';progress.max=48;progress.value=Math.min(total,48);progress.setAttribute('aria-label','Skill items answered');summary.append(heading,status,progress,resume);content.append(summary);
     content.insertAdjacentHTML('beforeend','<details><summary>Link an earlier assessment</summary><p>Enter its recovery code. This keeps the original answers, grades and submission lock. An assessment can belong to only one account.</p><form id="claim-form"><label for="claim-code">Recovery code</label><input id="claim-code" name="code" required maxlength="80" autocomplete="off" spellcheck="false"><button type="submit" class="button button-dark">Link assessment</button></form></details><button type="button" class="signout" id="account-signout">Sign out</button>');
     document.getElementById('claim-form').addEventListener('submit',async event=>{event.preventDefault();const button=event.target.querySelector('button');button.disabled=true;try{await post('auth/claim',{code:event.target.elements.code.value});clearCache();location.reload();}catch(error){note(error.message,true);}finally{button.disabled=false;}});
     document.getElementById('account-signout').addEventListener('click',async event=>{if(!canSwitch())return;event.target.disabled=true;try{await post('auth/logout');clearCache();location.replace('login.html');}catch(error){event.target.disabled=false;note(error.message,true);}});

@@ -1,0 +1,290 @@
+[
+  {
+    "id": "SS-01",
+    "area": "Communication",
+    "title": "Explain a delay",
+    "scenario": "A bug may delay your group’s feature. Your project leader is not technical and asks for an update.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send the error logs and describe which functions failed."
+      },
+      {
+        "id": "B",
+        "text": "Explain the impact, your next step, and when you will provide another update."
+      },
+      {
+        "id": "C",
+        "text": "Wait until you have a complete fix before giving an update."
+      },
+      {
+        "id": "D",
+        "text": "Report the delay and ask a teammate to explain the details."
+      }
+    ]
+  },
+  {
+    "id": "SS-02",
+    "area": "Communication",
+    "title": "Clarify a request",
+    "scenario": "A classmate asks you to “make the dashboard better.” You are unsure what they want changed.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Suggest a visual redesign and ask them to review it afterward."
+      },
+      {
+        "id": "B",
+        "text": "Ask which task is difficult and confirm a specific example of the desired improvement."
+      },
+      {
+        "id": "C",
+        "text": "Ask them to write a full specification before discussing the request."
+      },
+      {
+        "id": "D",
+        "text": "Make the changes that your group has requested most often before."
+      }
+    ]
+  },
+  {
+    "id": "SS-03",
+    "area": "Communication",
+    "title": "Share a technical finding",
+    "scenario": "Your group needs to understand why a website is slow. You have collected several technical measurements.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Present all measurements so the group has the complete picture."
+      },
+      {
+        "id": "B",
+        "text": "Summarize the main finding, explain its effect, and offer details for follow-up questions."
+      },
+      {
+        "id": "C",
+        "text": "Share only the solution you prefer to keep the discussion short."
+      },
+      {
+        "id": "D",
+        "text": "Send a tutorial on website performance before the meeting."
+      }
+    ]
+  },
+  {
+    "id": "SS-04",
+    "area": "Teamwork",
+    "title": "Recover a missed handoff",
+    "scenario": "A teammate misses a deadline, blocking your part of the group project. There is still time to adjust the plan.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Complete their part yourself and explain the change at the next meeting."
+      },
+      {
+        "id": "B",
+        "text": "Discuss the blocker privately, agree on a recovery plan, and update the group’s timeline."
+      },
+      {
+        "id": "C",
+        "text": "Ask the leader to reassign their tasks before you speak to them."
+      },
+      {
+        "id": "D",
+        "text": "Continue your available tasks and wait for their update."
+      }
+    ]
+  },
+  {
+    "id": "SS-05",
+    "area": "Teamwork",
+    "title": "Work through disagreement",
+    "scenario": "Two teammates disagree about which framework to use. Both approaches meet the project requirements.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ask each to compare the options against agreed criteria, then help the group decide."
+      },
+      {
+        "id": "B",
+        "text": "Vote immediately so the group can return to building."
+      },
+      {
+        "id": "C",
+        "text": "Support the teammate who has the most experience."
+      },
+      {
+        "id": "D",
+        "text": "Prototype both complete approaches before making any decision."
+      }
+    ]
+  },
+  {
+    "id": "SS-06",
+    "area": "Teamwork",
+    "title": "Balance participation",
+    "scenario": "One teammate rarely speaks during planning meetings, but submits thoughtful written ideas afterward.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ask for their view ahead of the next meeting and make space for it in the discussion."
+      },
+      {
+        "id": "B",
+        "text": "Explain that ideas need to be raised during the meeting to count."
+      },
+      {
+        "id": "C",
+        "text": "Assign them individual tasks so they do not need to participate in planning."
+      },
+      {
+        "id": "D",
+        "text": "Share their written ideas yourself to keep the meeting moving."
+      }
+    ]
+  },
+  {
+    "id": "SS-07",
+    "area": "Problem-solving",
+    "title": "Investigate an unfamiliar issue",
+    "scenario": "A feature fails on one laptop but works on the others. You do not know the cause yet.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Reinstall the project dependencies on every laptop."
+      },
+      {
+        "id": "B",
+        "text": "Compare the error, steps to reproduce, and environment before testing a focused explanation."
+      },
+      {
+        "id": "C",
+        "text": "Ask the affected teammate to use another laptop for now."
+      },
+      {
+        "id": "D",
+        "text": "Change the most recently edited function and check whether it helps."
+      }
+    ]
+  },
+  {
+    "id": "SS-08",
+    "area": "Problem-solving",
+    "title": "Check conflicting evidence",
+    "scenario": "A user reports missing records, but your first test shows all records are present.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Close the report because your test passed."
+      },
+      {
+        "id": "B",
+        "text": "Ask for the user’s exact steps and compare their filters and permissions with your test."
+      },
+      {
+        "id": "C",
+        "text": "Restore an older database backup to recover the missing records."
+      },
+      {
+        "id": "D",
+        "text": "Tell the user to refresh and report again if the problem continues."
+      }
+    ]
+  },
+  {
+    "id": "SS-09",
+    "area": "Problem-solving",
+    "title": "Choose a practical next step",
+    "scenario": "Your group has several ideas for fixing a recurring issue, but little time to investigate.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Choose the quickest change and deploy it immediately."
+      },
+      {
+        "id": "B",
+        "text": "Compare impact and evidence, then run a small reversible test of the most promising explanation."
+      },
+      {
+        "id": "C",
+        "text": "Research every possible cause before trying a change."
+      },
+      {
+        "id": "D",
+        "text": "Implement the solution used by a similar project without further checks."
+      }
+    ]
+  },
+  {
+    "id": "SS-10",
+    "area": "Adaptability",
+    "title": "Respond to feedback",
+    "scenario": "Your instructor says the prototype is difficult for beginners to navigate. You invested considerable time in its current design.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Explain the design decisions and keep the interface until more people complain."
+      },
+      {
+        "id": "B",
+        "text": "Ask for examples, observe a beginner trying it, and revise the most important obstacles."
+      },
+      {
+        "id": "C",
+        "text": "Replace the entire design immediately to show you accepted the feedback."
+      },
+      {
+        "id": "D",
+        "text": "Ask a teammate to handle the feedback while you continue your planned tasks."
+      }
+    ]
+  },
+  {
+    "id": "SS-11",
+    "area": "Adaptability",
+    "title": "Handle a changed requirement",
+    "scenario": "A project requirement changes halfway through development. Your group has a fixed submission date.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the original plan and explain the change was too late."
+      },
+      {
+        "id": "B",
+        "text": "Clarify the new priority, assess its effect, and agree on a revised scope with the group."
+      },
+      {
+        "id": "C",
+        "text": "Add the new requirement while keeping every existing commitment."
+      },
+      {
+        "id": "D",
+        "text": "Start implementing the change before discussing its effect on other tasks."
+      }
+    ]
+  },
+  {
+    "id": "SS-12",
+    "area": "Adaptability",
+    "title": "Learn a new tool",
+    "scenario": "Your team needs a tool you have not used before. A small task is due soon, and support is available.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ask someone experienced to complete your task while you watch."
+      },
+      {
+        "id": "B",
+        "text": "Learn the essentials, try a small example, and seek focused help where you get stuck."
+      },
+      {
+        "id": "C",
+        "text": "Complete a full course before attempting the task."
+      },
+      {
+        "id": "D",
+        "text": "Use your familiar tool without checking whether its output meets the team’s needs."
+      }
+    ]
+  }
+]

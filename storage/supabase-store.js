@@ -56,6 +56,11 @@ function supabaseStore(directory, { url = process.env.SUPABASE_URL, secret = pro
     queue = result.catch(() => {});
     return result;
   }
-  return { read, write, exclusive, ping: () => api('northstar_records?select=record_key&limit=1') };
+  async function syncTechnical(payload) {
+    const response=await request(base+'rpc/northstar_sync_technical',{method:'POST',headers:{apikey:secret,'Content-Type':'application/json'},body:JSON.stringify({payload}),signal:AbortSignal.timeout(3000)});
+    if(!response.ok)throw new Error('Technical reporting sync deferred.');
+    return response.json();
+  }
+  return { read, write, exclusive, syncTechnical, ping: () => api('northstar_records?select=record_key&limit=1') };
 }
 module.exports = { supabaseStore };

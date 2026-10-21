@@ -230,7 +230,7 @@
   @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .hero-journey { height:auto; } .hero { position:relative; } .hero-video,.hero-content,.scene-hill,.preview-sheet { transform:none!important; } .hero-content,.hero-bottom { opacity:1!important; } .star-rings,.star-glow,.journey-wash { display:none; } .how-motion .intro .step,.how-motion .preview-result { opacity:1; transform:none; transition:none; } .path-item[open] .path-detail { animation:none; } .intro .steps::after { transform:scaleY(1); transition:none; } .assessment-transition { display:none; } }
   .hero-assessment-actions{display:flex;align-items:center;flex-wrap:wrap;gap:24px}.hero-resume{color:#e0eeff;text-underline-offset:5px;padding:12px 0;font-size:16px}.hero-note{max-width:66ch}
 </style>
-<link rel="stylesheet" href="styles/astra-loading.css"><link rel="stylesheet" href="styles/northstar-integration.css?v=1"><script>document.documentElement.classList.add("astra-loading");</script><script src="scripts/astra-loading.js" defer></script></head>
+<link rel="stylesheet" href="styles/astra-loading.css"><link rel="stylesheet" href="styles/northstar-integration.css?v=1"><script>document.documentElement.classList.add("astra-loading");</script><script src="scripts/astra-loading.js" defer></script><style>#back-to-top{position:fixed;right:24px;bottom:24px;z-index:50;width:44px;height:44px;display:grid;place-items:center;border:1px solid #9bc6e6;border-radius:6px;background:#f0f7ff;color:#204abf;box-shadow:0 4px 16px #06152d22;cursor:pointer}#back-to-top[hidden]{display:none}#back-to-top:hover{background:#ddecff}#back-to-top svg{width:22px;height:22px}@media(max-width:600px){#back-to-top{right:16px;bottom:16px}}</style><style>#nav-logout{display:grid;place-items:center;width:44px;height:44px;padding:10px;border:1px solid #47607f;border-radius:6px;background:transparent;color:#ddf2ff;cursor:pointer}#nav-logout[hidden]{display:none}#nav-logout:hover{background:#12315b}#nav-logout svg{width:21px;height:21px}#nav-logout:disabled{opacity:.5;cursor:wait}</style></head>
 <body><div class="astra-loader" aria-label="Opening NorthStar"><div class="loader-identity"><img src="assets/astra-loading-star.png" alt="" width="240" height="160"><p class="loader-wordmark">NORTHSTAR</p><p class="loader-caption" role="status">Getting ready<span class="loader-dots" aria-hidden="true">...</span></p></div></div>
   <a class="skip" href="#main">Skip to content</a>
   <div id="landing">
@@ -244,7 +244,7 @@
       <div class="nav-shell"><nav class="nav wrap" aria-label="Main navigation">
         <a class="brand" href="#top"><span class="astra-mark" aria-hidden="true"><img src="assets/astra-orbit-logo.png" alt="" width="44" height="44"></span><span class="astra-wordmark">NORTHSTAR</span></a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button>
-        <div class="nav-links" id="nav-links"><a href="#how">How it works</a><a href="#paths">Career paths</a><a href="account.html">Sign in</a><a class="nav-cta" href="assessment.html">Assessment <span aria-hidden="true">→</span></a></div>
+        <div class="nav-links" id="nav-links"><a href="#how">How it works</a><a href="#paths">Career paths</a><a href="login.html" id="nav-account">Sign in</a><button id="nav-logout" type="button" aria-label="Sign out" title="Sign out" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M9 5H5v14h4m5-14 7 7-7 7m7-7H9"/></svg></button></div>
       </nav></div>
       <div class="hero-content wrap">
         <p class="eyebrow">Your future in IT starts with a direction</p>
@@ -405,5 +405,5 @@
     });
   })();
   </script>
-</body>
+<script src="scripts/account-nav.js" defer></script><button id="back-to-top" type="button" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 19V5m-5 5 5-5 5 5"/></svg></button><script src="scripts/back-to-top.js" defer></script></body>
 </html>

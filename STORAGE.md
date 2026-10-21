@@ -1,5 +1,7 @@
 # Private assessment storage
 
+For current signed-in accounts, see ACCOUNTS.md. Online Vercel storage uses Supabase with application-level encryption; DATABASE-OPERATIONS.md documents its backup scope, verified restore checks, editor audit history and structured reporting. The local-file and anonymous recovery workflows below remain supported. References to self-rating recommendations describe the legacy flow; current preliminary RF mapping is documented in STUDENT-MAPPING.md.
+
 ## Student workflow
 
 Run the Node server. Assessment pages show a real save status and save responses,
